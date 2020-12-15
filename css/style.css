@@ -1,0 +1,148 @@
+.profile_header_badge {
+    position: relative;
+    background-size: cover;
+}
+
+.profile_header_badge:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 3px;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.faceit_maps {
+    display: flex;
+    justify-content: space-between;
+}
+
+.faceit_maps>.plus_more {
+    line-height: 55px !important;
+    border: 0 !important;
+    height: 55px !important;
+    width: 110px !important;
+    background-size: cover;
+}
+
+.faceit_maps>.game_info_achievement {
+    position: relative;
+}
+
+.wr {
+    position: absolute;
+    font-size: 12px;
+    bottom: 0;
+    right: 0;
+    font-weight: bold;
+    line-height: 12px;
+    height: 14px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.wr>.lose,
+.kd>.lose {
+    color: tomato;
+}
+
+.wr>.win,
+.kd>.win {
+    color: #8bc34a;
+}
+
+.kd {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 12px;
+    font-weight: bold;
+    height: 14px;
+    line-height: 14px;
+    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+}
+
+.winrate {
+    font-weight: bold;
+    font-size: 24px;
+    z-index: 9;
+    position: relative;
+}
+
+.faceit_maps>.game_info_achievement:before {
+    content: "";
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.showcase_faceit_content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.showcase_faceit{
+	max-width: 660px;
+    display: flex;
+    justify-content: space-between;
+    width: 640px;
+    margin: 0 auto;
+}
+
+.faceit_badge {
+    width: 260px;
+}
+
+.faceit_badge>.profile_header_badge {
+    margin-bottom: 0;
+}
+
+.showcase_stat {
+    text-align: center;
+}
+
+.showcase_stat>.lose {
+    color: tomato !important;
+}
+
+.showcase_stat>.win {
+    color: #8bc34a !important;
+}
+
+.showcase_faceit>.showcase_stat:hover {
+    cursor: default;
+}
+
+.showcase_faceit>.showcase_stat{
+	margin-left: 0!important;
+}
+
+.showcase_faceit>.showcase_stat:hover label {
+    color: #9b9b9b !important;
+}
+
+.not_found {
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.faceit_badge .favorite_badge_icon::after {
+    content: "0000";
+    bottom: 0;
+    left: 11px;
+    font-weight: bold;
+    color: #fff;
+    position: absolute;
+}
+
+.faceit_badge .ellipsis {
+    line-height: 15px;
+}
