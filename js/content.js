@@ -22,6 +22,7 @@ function gotMessage(message, sender, sendResponse) {
             url: 'https://open.faceit.com/data/v4/search/players?nickname=' + steam_id + '&offset=0&limit=20',
             success: function(data) {
                 if (Object.keys(data.items).length == 0) {
+                    $('.LoadingWrapper').remove();
                     $('.profile_content').prepend('<div class="showcase_content_bg showcase_stats_row not_found">Faceit account wasn`t found <img src="https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad" alt=":sotsad:" class="emoticon"></div>');
                     return;
                 }
@@ -55,6 +56,13 @@ function gotMessage(message, sender, sendResponse) {
                                                 $('.faceit_maps').append('<div data-tooltip-html="' + data['segments'][map]['label'] + '" class="game_info_achievement plus_more" style="background-image: url(' + data['segments'][map]['img_small'] + ');"><span class="kd">K/D: <span class="' + ((data['segments'][map]['stats']['Average K/D Ratio'] >= 1) ? 'win' : 'lose') + '">' + data['segments'][map]['stats']['Average K/D Ratio'] + '</span></span><span class="winrate">' + data['segments'][map]['stats']['Win Rate %'] + '%</span><span class="wr"><span class="win">' + data['segments'][map]['stats']['Wins'] + '</span>:<span class="lose">' + (parseInt(data['segments'][map]['stats']['Matches']) - parseInt(data['segments'][map]['stats']['Wins'])) + '</span></span></div>')
                                             }
                                         });
+                                    },
+                                    error: function(data) {
+                                        if (data.status == 404) {
+                                            $('.LoadingWrapper').remove();
+                                            $('.profile_content').prepend('<div class="showcase_content_bg showcase_stats_row not_found">An error <img src="https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad" alt=":sotsad:" class="emoticon"></div>');
+                                            return;
+                                        }
                                     }
                                 });
                             }
@@ -62,7 +70,7 @@ function gotMessage(message, sender, sendResponse) {
                     }
                 });
             },
-            beforeSend: function(data){
+            beforeSend: function(data) {
                 $('.profile_content').prepend('<div class="LoadingWrapper"><div class="LoadingThrobber"><div class="Bar Bar1"></div><div class="Bar Bar2"></div><div class="Bar Bar3"></div></div></div>');
             }
         });
