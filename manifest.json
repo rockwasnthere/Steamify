@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Steamify - Faceit stats checker",
     "description": "Allows you to view additional information about account on faceit platform.",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "icons":
     {
         "16": "images/icon/16.png",
