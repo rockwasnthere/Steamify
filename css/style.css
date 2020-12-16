@@ -1,3 +1,25 @@
+.faceit_content{
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.banned{
+    content: "";
+    position: absolute;
+    background-color: #f44336;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 5px 5px 0 0;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
 .profile_header_badge {
     position: relative;
     background-size: cover;
@@ -82,17 +104,9 @@
     background: rgba(0, 0, 0, 0.5);
 }
 
-.showcase_faceit_content {
-    display: flex;
-    justify-content: space-between;
-}
-
 .showcase_faceit{
-	max-width: 660px;
     display: flex;
     justify-content: space-between;
-    width: 640px;
-    margin: 0 auto;
 }
 
 .faceit_badge {
@@ -107,11 +121,11 @@
     text-align: center;
 }
 
-.showcase_stat>.lose {
+.showcase_stat .lose {
     color: tomato !important;
 }
 
-.showcase_stat>.win {
+.showcase_stat .win {
     color: #8bc34a !important;
 }
 
@@ -137,7 +151,8 @@
 .faceit_badge .favorite_badge_icon::after {
     content: "0000";
     bottom: 0;
-    left: 11px;
+    left: 50%;
+    transform: translateX(-50%);
     font-weight: bold;
     color: #fff;
     position: absolute;
@@ -145,4 +160,47 @@
 
 .faceit_badge .ellipsis {
     line-height: 15px;
+}
+
+.wrapper-orange .Bar{
+    background-color: #f44336!important;
+}
+
+.faceit_content .value{
+    font-size: 0.5em!important;
+    font-weight: bold!important;
+    color: #969696!important;
+}
+
+.faceit_content .label{
+    font-size: 0.36em!important;
+    text-transform: uppercase;
+}
+
+.showcase_stats{
+    display: flex;
+    flex-direction: column;
+    width: 620px;
+    margin-right: 20px;
+}
+
+.showcase_stat_faceit{
+    display: flex!important;
+    align-items: center;
+}
+
+.showcase_faceit_content{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.game_info_stats{
+    width: 100%;
+}
+
+.white{
+    color: #fff!important;
 }
