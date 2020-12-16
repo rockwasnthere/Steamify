@@ -28,8 +28,8 @@
     "content_scripts": [
     {
         "matches": [
-            "https://steamcommunity.com/id/*",
-            "https://steamcommunity.com/profiles/*"
+            "*://steamcommunity.com/id/*",
+            "*://steamcommunity.com/profiles/*"
         ],
         "js": [
             "js/jquery.js",
