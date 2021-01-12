@@ -1,88 +1,90 @@
 // Bearer faceit client side key
-const BEARER = 'Bearer 2ca58611-1bf4-4b37-b0a9-042631fd9f80';
-const IDENT = '76561197960265728';
-const API_URL = 'https://open.faceit.com/data/v4';
+const
+    BEARER = 'Bearer 2ca58611-1bf4-4b37-b0a9-042631fd9f80',
+    IDENT = '76561197960265728',
 
-let average = '';
+    // Faceit API v4 url
+    API_URL = 'https://open.faceit.com/data/v4',
+
+    // No faceit profile
+    L_NOT_FOUND =
+        $('<div>', {
+            class: "showcase_content_bg showcase_stats_row not_found",
+            text: "Faceit account wasn`t found"
+        }).append($('<img>', {
+            alt: ":sotsad:",
+            class: "emoticon",
+            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
+        })),
+
+    // No available matches
+    L_MATCHES_NOT_FOUND =
+        $('<div>', {
+            class: "showcase_content_bg showcase_stats_row not_found",
+            text: "No matches found"
+        }).append($('<img>', {
+            alt: ":sotsad:",
+            class: "emoticon",
+            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
+        })),
+
+    // Preloader bar
+    L_LOADING =
+        $('<div>', {
+            class: "LoadingWrapper wrapper-orange"
+        }).append($('<div>', { class: "LoadingThrobber" })
+            .append($('<div>', { class: "Bar Bar1" }))
+            .append($('<div>', { class: "Bar Bar2" }))
+            .append($('<div>', { class: "Bar Bar3" }))),
+
+    // An error happend
+    L_ERROR =
+        $('<div>', {
+            class: "showcase_content_bg showcase_stats_row not_found",
+            text: "An error"
+        })
+        .append($('<img>', {
+            alt: ":sotsad:",
+            class: "emoticon",
+            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
+        })),
+
+    // No csgo profile on faceit
+    L_NO_CSGO =
+        $('<div>', {
+            class: "showcase_content_bg showcase_stats_row not_found",
+            text: "No CSGO stats on Faceit"
+        })
+        .append($('<img>', {
+            alt: ":sotsad:",
+            class: "emoticon",
+            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
+        })),
+
+    // Current maps pool
+    MAPS_VETO = [
+        'de_nuke',
+        'de_train',
+        'de_dust2',
+        'de_mirage',
+        'de_inferno',
+        'de_vertigo',
+        'de_overpass'
+    ],
+    
+    additional_th = '<th colspan=7>PLAYER</th><th>MVPs</th><th>TRIPLE</th><th>QUADRO</th><th>PENTA</th>';
+
 let avgHS = 0,
     avgKD = 0,
-    size = 20;
-
-let demo_url,
+    size = 20,
+    average = '',
+    demo_url,
     faceit_url,
     finished_at,
     global_data,
-    faceit_playerID;
-
-let match_list = [],
+    faceit_playerID,
+    match_list = [],
     list_of_players = [];
-
-// No faceit profile
-const L_NOT_FOUND =
-    $('<div>', {
-        class: "showcase_content_bg showcase_stats_row not_found",
-        text: "Faceit account wasn`t found"
-    }).append($('<img>', {
-        alt: ":sotsad:",
-        class: "emoticon",
-        src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-    }));
-
-// No available matches
-const L_MATCHES_NOT_FOUND =
-    $('<div>', {
-        class: "showcase_content_bg showcase_stats_row not_found",
-        text: "No matches found"
-    }).append($('<img>', {
-        alt: ":sotsad:",
-        class: "emoticon",
-        src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-    }));
-
-// Preloader bar
-const L_LOADING =
-    $('<div>', { class: "LoadingWrapper wrapper-orange" })
-    .append($('<div>', { class: "LoadingThrobber" })
-        .append($('<div>', { class: "Bar Bar1" }))
-        .append($('<div>', { class: "Bar Bar2" }))
-        .append($('<div>', { class: "Bar Bar3" })));
-
-// An error happend
-const L_ERROR =
-    $('<div>', {
-        class: "showcase_content_bg showcase_stats_row not_found",
-        text: "An error"
-    })
-    .append($('<img>', {
-        alt: ":sotsad:",
-        class: "emoticon",
-        src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-    }));
-
-// No csgo profile on faceit
-const L_NO_CSGO =
-    $('<div>', {
-        class: "showcase_content_bg showcase_stats_row not_found",
-        text: "No CSGO stats on Faceit"
-    })
-    .append($('<img>', {
-        alt: ":sotsad:",
-        class: "emoticon",
-        src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-    }));
-
-// Current maps pool
-const MAPS_VETO = [
-    'de_nuke',
-    'de_train',
-    'de_dust2',
-    'de_mirage',
-    'de_inferno',
-    'de_vertigo',
-    'de_overpass'
-];
-
-const additional_th = '<th colspan=7>PLAYER</th><th>MVPs</th><th>TRIPLE</th><th>QUADRO</th><th>PENTA</th>';
 
 // Ajax setup headers
 $.ajaxSetup({
@@ -154,9 +156,9 @@ function showcaseLayout(matches, winrate, average_hs, average_kd, longest_streak
             </div>
             <div class="game_info_faceit_header faceit_stats_load">CLICK TO LOAD LAST 20 GAMES STATS</div>
         </div>`;
-
 }
 
+// Stats layout
 function statsLayout() {
     return `
     <div class="page_content faceit_stats_content under_popup">
@@ -217,36 +219,41 @@ function mapsLayout(label, image, average_kd, winrate, wins, matches) {
 }
 
 // Get 20 last games
-
 function getLastGames() {
+
     var cnt = 0;
+
     $.each(global_data, function(game) {
+
         var counter = game;
         var game = global_data[game];
+
         // Get match detailed data to create a table
         $.getJSON({
             url: API_URL + '/matches/' + game.match_id + '/stats',
             success: function(data) {
                 $.each(data.rounds, function(stats) {
-                    let match = data.rounds[stats];
-                    let round_stats = match.round_stats;
-                    let winner = round_stats.Winner;
-                    let map = round_stats.Map;
-                    let region = round_stats.Region;
-                    let score = round_stats.Score;
-                    let pls = [];
+
+                    let match = data.rounds[stats],
+                        round_stats = match.round_stats,
+                        winner = round_stats.Winner,
+                        map = round_stats.Map,
+                        region = round_stats.Region,
+                        score = round_stats.Score,
+                        pls = [];
+
                     // List of teams in match
                     $.each(match.teams, function(teams) {
-                        let team = match.teams[teams];
-                        let team_name = team.team_stats.Team;
+                        let team = match.teams[teams],
+                            team_name = team.team_stats.Team;
 
                         match_list[counter].match.teams = [match.teams];
                         match_list[counter].leaver = 0;
 
                         $.each(team.players, function(players) {
                             // List of players in match
-                            let player = team.players[players];
-                            let player_stats = player.player_stats;
+                            let player = team.players[players],
+                                player_stats = player.player_stats;
 
                             pls.push(player.player_id);
 
@@ -286,16 +293,17 @@ function getLastGames() {
                 $('.faceit_stats_content').attr('style', 'margin-top: 32px !important');
                 $('.faceit_stats').show();
                 $('.faceit_stats_load').text('LOADING... [' + cnt + ']');
+
                 if (cnt === (global_data.length - 1)) {
+
                     $('.faceit_stats_load').text('LAST ' + (global_data.length) + ' GAMES');
 
                     $.each(match_list, function(m) {
-                        let team_A = match_list[m].match.teams[0][0];
-                        let team_B = match_list[m].match.teams[0][1];
 
-                        let is_winner = match_list[m].match.winner;
-                        let winner_id = match_list[m].match.winner_id;
-
+                        let team_A = match_list[m].match.teams[0][0],
+                            team_B = match_list[m].match.teams[0][1],
+                            is_winner = match_list[m].match.winner,
+                            winner_id = match_list[m].match.winner_id;
 
                         if (match_list[m].leaver) {
                             $('.faceit_stats_tbody').append(
@@ -511,7 +519,7 @@ if (!$(".faceit_maps")[0]) {
         url: API_URL + '/search/players?nickname=' + steam_id + '&offset=0&limit=1',
         success: function(data) {
 
-            // If profile not found return error
+            // If faceit profile not found return error
             if (Object.keys(data.items).length == 0) {
                 $('.LoadingWrapper').hide();
                 $('.profile_content').prepend(L_NOT_FOUND);
@@ -519,9 +527,10 @@ if (!$(".faceit_maps")[0]) {
             }
 
             faceit_playerID = data.items[0].player_id;
+
             let lose = 0,
-                win = 0;
-            let banned = data.items[0].status;
+                win = 0,
+                banned = data.items[0].status;
 
             // Check profile bans
             if (banned === 'banned') {
@@ -587,6 +596,7 @@ if (!$(".faceit_maps")[0]) {
                                 'Authorization': null
                             },
                             success: function(data) {
+
                                 let K = 0,
                                     HS = 0,
                                     KD = 0,
@@ -596,7 +606,7 @@ if (!$(".faceit_maps")[0]) {
 
                                 $.each(data, function(match) {
                                     var s = 0;
-                                    while (s != data.length - 1) {((match_list[match + s].match.id === data[match].matchId)?(match_list[match + s].elo = data[match].elo, s = data.length - 1):s++);}
+                                    while (s != data.length - 1) {((match_list[match + s].match.id === data[match].matchId) ? (match_list[match + s].elo = data[match].elo, s = data.length - 1) : s++);}
                                 });
 
                                 for (i = 0; i < data.length; i++) {
@@ -616,14 +626,18 @@ if (!$(".faceit_maps")[0]) {
                             url: API_URL + '/players/' + faceit_playerID,
                             success: function(data) {
                                 if (data.games['csgo']) {
-                                    let profile_data = data;
-                                    let faceit_elo = profile_data.games['csgo'].faceit_elo;
-                                    let skill_level = profile_data.games['csgo'].skill_level;
+
+                                    let profile_data = data,
+                                        faceit_elo = profile_data.games['csgo'].faceit_elo,
+                                        skill_level = profile_data.games['csgo'].skill_level;
+
                                     $.getJSON({
                                         url: API_URL + '/players/' + faceit_playerID + '/stats/csgo',
                                         success: function(data) {
-                                            let lifetime = data.lifetime;
-                                            let segments = data.segments;
+
+                                            let lifetime = data.lifetime,
+                                                segments = data.segments;
+
                                             $('.LoadingWrapper').hide();
                                             $('.faceit_content').prepend(
                                                 showcaseLayout(
@@ -662,6 +676,7 @@ if (!$(".faceit_maps")[0]) {
                                                     }
                                                 }
                                             });
+                                            // Check if maps played length equals to MapsVeto length to center them
                                             if ($('.faceit_maps > *').length < MAPS_VETO.length) {
                                                 $('.faceit_maps').css('justify-content', 'center');
                                             }
@@ -701,13 +716,13 @@ if (!$(".faceit_maps")[0]) {
         }
     });
 }
-
+// Get last 20 games when click on button
 $(document).on('click', '.faceit_stats_load', function() {
     if (!$(".faceit_row")[0]) {
         getLastGames();
     }
 });
-
+// Open match details
 $(document).on('click', '.filter_tag_button_ctn', function() {
     $(this).children().children().children().toggleClass('down').toggleClass('up');
     $('tr[data-id=' + $(this).parents('.faceit_row').data('match-id') + ']').toggle();
