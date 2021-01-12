@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
     "name": "Steamify - Faceit stats checker",
-    "description": "Allows you to view additional information about account on faceit platform.",
-    "version": "1.0.2",
+    "description": "Steamify is a Chrome extension that displays a users detailed stats on FACEIT on their Steam profile.",
+    "version": "1.1",
     "icons":
     {
         "16": "images/icon/16.png",
@@ -10,9 +10,6 @@
         "64": "images/icon/64.png",
         "128": "images/icon/128.png"
     },
-    "permissions": [
-        "tabs"
-    ],
     "web_accessible_resources": [
         "images/lvl_1.svg",
         "images/lvl_2.svg",
@@ -39,12 +36,9 @@
             "css/style.css"
         ]
     }],
-    "background":
+    "browser_action":
     {
-        "scripts": ["js/background.js"]
-    },
-    "browser_action": {
         "default_icon": "images/icon/128.png",
-        "default_title": "Click here to check Faceit stats"
+        "default_title": "Steamify"
     }
 }
