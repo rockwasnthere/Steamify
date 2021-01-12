@@ -184,6 +184,39 @@ function statsLayout() {
         </table>
     </div>`;
 }
+// Team layout
+function playersLayout(match_id,nickname,kills,assists,deaths,kd,kr,hs_percent,hs,mvps,triple,quadro,penta) {
+    return `
+    <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
+        <td colspan=3>
+            <span><a href="https://www.faceit.com/en/players/` + nickname + `" target="_blank"></span>` + nickname + `</span></a>
+        </td>
+        <td>
+            <span>` + kills + `-` + assists + `-` + deaths + `</span>
+        </td>
+        <td>
+            <span class="stat_` + ((kd < 1) ? 'decrease' : 'increase') + `">` + kd + `</span>
+        </td>
+        <td>
+            <span class="stat_` + ((kr < 1) ? 'decrease' : 'increase') + `">` + kr + `</span>
+        </td>
+        <td>
+            <span>` + hs_percent + `% (` + hs + `)</span>
+        </td>
+        <td>
+            <span class="` + ((mvps > 0) ? 'text-white' : '') + `">` + mvps + `</span>
+        </td>
+        <td>
+            <span class="` + ((triple > 0) ? 'text-white' : '') + `">` + triple + `</span>
+        </td>
+        <td>
+            <span class="` + ((quadro > 0) ? 'text-white' : '') + `">` + quadro + `</span>
+        </td>
+        <td>
+            <span class="` + ((penta > 0) ? 'text-white' : '') + `">` + penta + `</span>
+        </td>
+    </tr>`;
+}
 
 // Maps layout
 function mapsLayout(label, image, average_kd, winrate, wins, matches) {
@@ -240,7 +273,7 @@ function getLastGames() {
                         map = round_stats.Map,
                         region = round_stats.Region,
                         score = round_stats.Score,
-                        pls = [];
+                        players_list = [];
 
                     // List of teams in match
                     $.each(match.teams, function(teams) {
@@ -255,21 +288,16 @@ function getLastGames() {
                             let player = team.players[players],
                                 player_stats = player.player_stats;
 
-                            pls.push(player.player_id);
+                            players_list.push(player.player_id);
 
                             if (player.player_id === faceit_playerID) {
                                 // Player stats in game
                                 if (match_list[counter].match.id === game.match_id) {
                                     match_list[counter].team_name = team_name;
-
                                     match_list[counter].team_id = team.team_id;
-
                                     match_list[counter].score = score;
                                     match_list[counter].map = map;
-                                    match_list[counter].map = map;
-
                                     match_list[counter].faceit_url = 'https://www.faceit.com/en/csgo/room/' + game.match_id;
-
                                     match_list[counter].assists = player_stats['Assists'];
                                     match_list[counter].deaths = player_stats['Deaths'];
                                     match_list[counter].kills = player_stats['Kills'];
@@ -286,7 +314,7 @@ function getLastGames() {
                         });
 
                     });
-                    if ($.inArray(faceit_playerID, pls) <= -1) { match_list[counter].leaver = 1 }
+                    if ($.inArray(faceit_playerID, players_list) <= -1) { match_list[counter].leaver = 1 }
                 });
             },
             complete: function() {
@@ -422,68 +450,42 @@ function getLastGames() {
                             $.each(team_A.players, function(players) {
                                 let player = team_A.players[players];
                                 $('.' + m + '_team_A').after(
-                                    `<tr data-id="` + m + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
-                                                    <td colspan=3>
-                                                        <span><a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank"></span>` + player.nickname + `</span></a>
-                                                    </td>
-                                                    <td>
-                                                        <span>` + player.player_stats['Kills'] + `-` + player.player_stats['Assists'] + `-` + player.player_stats['Deaths'] + `</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="stat_` + ((player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/D Ratio'] + `</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="stat_` + ((player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/R Ratio'] + `</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>` + player.player_stats['Headshots %'] + `% (` + player.player_stats['Headshot'] + `)</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="` + ((player.player_stats['MVPs'] > 0) ? 'text-white' : '') + `">` + player.player_stats['MVPs'] + `</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="` + ((player.player_stats['Triple Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Triple Kills'] + `</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="` + ((player.player_stats['Quadro Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Quadro Kills'] + `</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="` + ((player.player_stats['Penta Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Penta Kills'] + `</span>
-                                                    </td>
-                                                </tr>`)
+                                	playersLayout(
+                                		m,
+										player.nickname,
+										player.player_stats['Kills'],
+										player.player_stats['Assists'],
+										player.player_stats['Deaths'],
+										player.player_stats['K/D Ratio'],
+										player.player_stats['K/R Ratio'],
+										player.player_stats['Headshots %'],
+										player.player_stats['Headshot'],
+										player.player_stats['MVPs'],
+										player.player_stats['Triple Kills'],
+										player.player_stats['Quadro Kills'],
+										player.player_stats['Penta Kills']
+                                	)
+                                )
                             });
                             $.each(team_B.players, function(players) {
                                 let player = team_B.players[players];
                                 $('.' + m + '_team_B').after(
-                                    `<tr data-id="` + m + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
-                                            <td colspan=3>
-                                                <span><a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank"></span>` + player.nickname + `</span></a>
-                                            </td>
-                                            <td>
-                                                <span>` + player.player_stats['Kills'] + `-` + player.player_stats['Assists'] + `-` + player.player_stats['Deaths'] + `</span>
-                                            </td>
-                                            <td>
-                                                <span class="stat_` + ((player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/D Ratio'] + `</span>
-                                            </td>
-                                            <td>
-                                                <span class="stat_` + ((player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/R Ratio'] + `</span>
-                                            </td>
-                                            <td>
-                                                <span>` + player.player_stats['Headshots %'] + `% (` + player.player_stats['Headshot'] + `)</span>
-                                            </td>
-                                            <td>
-                                                <span class="` + ((player.player_stats['MVPs'] > 0) ? 'text-white' : '') + `">` + player.player_stats['MVPs'] + `</span>
-                                            </td>
-                                            <td>
-                                                <span class="` + ((player.player_stats['Triple Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Triple Kills'] + `</span>
-                                            </td>
-                                            <td>
-                                                <span class="` + ((player.player_stats['Quadro Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Quadro Kills'] + `</span>
-                                            </td>
-                                            <td>
-                                                <span class="` + ((player.player_stats['Penta Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Penta Kills'] + `</span>
-                                            </td>
-                                        </tr>`)
+                                	playersLayout(
+                                		m,
+										player.nickname,
+										player.player_stats['Kills'],
+										player.player_stats['Assists'],
+										player.player_stats['Deaths'],
+										player.player_stats['K/D Ratio'],
+										player.player_stats['K/R Ratio'],
+										player.player_stats['Headshots %'],
+										player.player_stats['Headshot'],
+										player.player_stats['MVPs'],
+										player.player_stats['Triple Kills'],
+										player.player_stats['Quadro Kills'],
+										player.player_stats['Penta Kills']
+                                	)
+                                )
                             });
                         }
                     });
