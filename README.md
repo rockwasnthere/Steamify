@@ -2,12 +2,6 @@
 
 Steamify is a Chrome extension that enhances the experience on steamcommunity.com with faceit.com.
 
-v1.1
-     - Added match history for the last 20 games (if available)
-          - Detailed match stats (including ELO changes)
-          - Demo download link (if available)
-     - Bug fixes
-
 It works on any Steam profile, doesn't matter if it is private or not, as far as the Steam profile has been connected to FACEIT account, it will show data.
 Is pretty useful if you want to understand how good the player is before adding him or easily find out if the player is smurf or not.
 This extension will replace all similar online-services.
