@@ -1,8 +1,8 @@
-// Bearer faceit client side key
 const
+	// Bearer faceit client side key
     BEARER = 'Bearer 2ca58611-1bf4-4b37-b0a9-042631fd9f80',
+    // Steam base id64
     IDENT = '76561197960265728',
-
     // Faceit API v4 url
     API_URL = 'https://open.faceit.com/data/v4',
 
@@ -94,7 +94,7 @@ $.ajaxSetup({
 });
 
 // Showcase layout
-function showcaseLayout(matches, winrate, average_hs, average_kd, longest_streak, current_streak, nickname, cover_image, membership_type, elo, skill_level, win, lose, last20HS, last20KD) {
+function showcaseLayout(lifetime, profile, elo, skill_level, win, lose, last20HS, last20KD) {
     return `
         <div class="showcase_faceit_content">
             <div class="showcase_stats">
@@ -103,29 +103,29 @@ function showcaseLayout(matches, winrate, average_hs, average_kd, longest_streak
                         <div class="value"><span class="white">LAST 20</span> / OVERALL</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Matches played w/o leaves">
-                        <div class="value">` + matches + `</div>
+                        <div class="value">` + lifetime['Matches'] + `</div>
                         <div class="label">MATCHES</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="white">` + Math.round((win / 20) * 100) + `</span> / ` + winrate + `%</div>
+                        <div class="value"><span class="white">` + Math.round((win / 20) * 100) + `</span> / ` + lifetime['Win Rate %'] + `%</div>
                         <div class="label">WINRATE</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="white">` + last20HS + `</span> / ` + average_hs + `%</div>
+                        <div class="value"><span class="white">` + last20HS + `</span> / ` + lifetime['Average Headshots %'] + `%</div>
                         <div class="label">AVG HS%</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="white">` + last20KD + `</span> / ` + average_kd + `</div>
+                        <div class="value"><span class="white">` + last20KD + `</span> / ` + lifetime['Average K/D Ratio'] + `</div>
                         <div class="label">AVG K/D</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Current streak / Max. streak">
-                        <div class="value">` + `<span class="` + ((current_streak == 0) ? 'lose' : 'win') + `">` + current_streak + `</span>` + ` / ` + longest_streak + `</div>
+                        <div class="value">` + `<span class="` + ((lifetime['Current Win Streak'] == 0) ? 'lose' : 'win') + `">` + lifetime['Current Win Streak'] + `</span>` + ` / ` + lifetime['Longest Win Streak'] + `</div>
                         <div class="label">STREAK</div>
                     </a>
                 </div>
             </div>
             <div class="faceit_badge">
-                <div class="profile_header_badge" style="background-image: url(` + cover_image + `);">
+                <div class="profile_header_badge" style="background-image: url(` + profile.cover_image + `);">
                     <div class="favorite_badge">
                         <style>
                         .faceit_badge .favorite_badge_icon::after {
@@ -133,13 +133,13 @@ function showcaseLayout(matches, winrate, average_hs, average_kd, longest_streak
                         }
                         </style>
                         <div class="favorite_badge_icon" data-tooltip-html="Level and ELO on Faceit">
-                            <a class="whiteLink" target="_blank" href="https://faceit.com/en/players/` + nickname + `">
+                            <a class="whiteLink" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">
                                 <img src="` + chrome.extension.getURL('images/lvl_' + skill_level + '.svg') + `" class="badge_icon small"> </a> </div>
                                 <div class="favorite_badge_description">
                                     <div class="name ellipsis">
-                                        <a class="whiteLink" target="_blank" href="https://faceit.com/en/players/` + nickname + `">` + nickname + `</a>
+                                        <a class="whiteLink" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">` + profile.nickname + `</a>
                                     </div>
-                                    Membership: ` + membership_type + `<br>Last 20 games:
+                                    Membership: ` + profile.membership_type + `<br>Last 20 games:
                                 <div class="favorite_bi_win">` + win + `</div>:<div class="favorite_bi_lose">` + lose + `</div>
                         </div>
                     </div>
@@ -157,7 +157,6 @@ function showcaseLayout(matches, winrate, average_hs, average_kd, longest_streak
             <div class="game_info_faceit_header faceit_stats_load">CLICK TO LOAD LAST 20 GAMES STATS</div>
         </div>`;
 }
-
 // Stats layout
 function statsLayout() {
     return `
@@ -185,73 +184,70 @@ function statsLayout() {
     </div>`;
 }
 // Players layout
-function playersLayout(match_id,team,player) {
+function playersLayout(match_id, team, player) {
     return $('.' + match_id + '_team_' + team).after(`
-    	<tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
-	        <td colspan=3>
-	            <span><a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank"></span>` + player.nickname + `</span></a>
-	        </td>
-	        <td>
-	            <span>` + player.player_stats['Kills'] + `-` + player.player_stats['Assists'] + `-` + player.player_stats['Deaths'] + `</span>
-	        </td>
-	        <td>
-	            <span class="stat_` + ((player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/D Ratio'] + `</span>
-	        </td>
-	        <td>
-	            <span class="stat_` + ((player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/R Ratio'] + `</span>
-	        </td>
-	        <td>
-	            <span>` + player.player_stats['Headshots %'] + `% (` + player.player_stats['Headshot'] + `)</span>
-	        </td>
-	        <td>
-	            <span class="` + ((player.player_stats['MVPs'] > 0) ? 'text-white' : '') + `">` + player.player_stats['MVPs'] + `</span>
-	        </td>
-	        <td>
-	            <span class="` + ((player.player_stats['Triple Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Triple Kills'] + `</span>
-	        </td>
-	        <td>
-	            <span class="` + ((player.player_stats['Quadro Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Quadro Kills'] + `</span>
-	        </td>
-	        <td>
-	            <span class="` + ((player.player_stats['Penta Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Penta Kills'] + `</span>
-	        </td>
-	    </tr>`
-    );
+        <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
+            <td colspan=3>
+                <span><a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank"></span>` + player.nickname + `</span></a>
+            </td>
+            <td>
+                <span>` + player.player_stats['Kills'] + `-` + player.player_stats['Assists'] + `-` + player.player_stats['Deaths'] + `</span>
+            </td>
+            <td>
+                <span class="stat_` + ((player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/D Ratio'] + `</span>
+            </td>
+            <td>
+                <span class="stat_` + ((player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/R Ratio'] + `</span>
+            </td>
+            <td>
+                <span>` + player.player_stats['Headshots %'] + `% (` + player.player_stats['Headshot'] + `)</span>
+            </td>
+            <td>
+                <span class="` + ((player.player_stats['MVPs'] > 0) ? 'text-white' : '') + `">` + player.player_stats['MVPs'] + `</span>
+            </td>
+            <td>
+                <span class="` + ((player.player_stats['Triple Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Triple Kills'] + `</span>
+            </td>
+            <td>
+                <span class="` + ((player.player_stats['Quadro Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Quadro Kills'] + `</span>
+            </td>
+            <td>
+                <span class="` + ((player.player_stats['Penta Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Penta Kills'] + `</span>
+            </td>
+        </tr>`);
 }
-
 // Maps layout
-function mapsLayout(label, image, average_kd, winrate, wins, matches) {
+function mapsLayout(map) {
     return $('<div>', {
             class: "game_info_achievement plus_more",
-            'data-tooltip-html': label,
-            style: "background-image: url(" + image + ");"
+            'data-tooltip-html': map.label,
+            style: "background-image: url(" + map.img_small + ");"
         })
         .append($('<span>', {
                 class: "kd",
                 text: "K/D:"
             })
             .append($('<span>', {
-                class: ((average_kd >= 1) ? 'win' : 'lose'),
-                text: average_kd
+                class: ((map.stats['Average K/D Ratio'] >= 1) ? 'win' : 'lose'),
+                text: map.stats['Average K/D Ratio']
             })))
         .append($('<span>', {
             class: "winrate",
-            text: winrate + "%"
+            text: map.stats['Win Rate %'] + "%"
         }))
         .append($('<span>', {
                 class: "wr",
             })
             .append($('<span>', {
                 class: "win",
-                text: wins
+                text: map.stats['Wins']
             }))
             .append(':')
             .append($('<span>', {
                 class: "lose",
-                text: (parseInt(matches) - parseInt(wins))
+                text: (parseInt(map.stats['Matches']) - parseInt(map.stats['Wins']))
             })));
 }
-
 // Get 20 last games
 function getLastGames() {
 
@@ -449,12 +445,10 @@ function getLastGames() {
                                             <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_B">` + additional_th + `</tr>`
                             );
                             $.each(team_A.players, function(players) {
-                            	let player = team_A.players[players];
-                            	playersLayout(m,'A',player);
+                                playersLayout(m, 'A', team_A.players[players]);
                             });
                             $.each(team_B.players, function(players) {
-                            	let player = team_B.players[players];
-                                playersLayout(m,'B',player);
+                                playersLayout(m, 'B', team_B.players[players]);
                             });
                         }
                     });
@@ -467,12 +461,13 @@ function getLastGames() {
         $.getJSON({
             url: API_URL + '/matches/' + game.match_id,
             success: function(data) {
-                try { match_list[counter].demo_url = data.demo_url[0]; } catch (e) { match_list[counter].demo_url = 'empty'; }
                 match_list[counter].finished_at = new Date(data.finished_at * 1000).toLocaleString('en-GB');
             },
             error: function(data) {
-                try { match_list[counter].demo_url = data.demo_url[0]; } catch (e) { match_list[counter].demo_url = 'empty'; }
                 match_list[counter].finished_at = '---';
+            },
+            complete: function(data) {
+                try { match_list[counter].demo_url = data.responseJSON.demo_url[0]; } catch (e) { match_list[counter].demo_url = 'empty'; }
             }
         });
     });
@@ -546,13 +541,12 @@ if (!$(".faceit_maps")[0]) {
                                     if (game.teams[players].players[player].player_id == faceit_playerID) {
                                         if (game.results.winner === players) {
                                             win++;
-                                            match_list[counter].match.winner_id = game.results.winner;
                                             match_list[counter].match.winner = 1;
                                         } else {
                                             lose++;
-                                            match_list[counter].match.winner_id = game.results.winner;
                                             match_list[counter].match.winner = 0;
                                         }
+                                        match_list[counter].match.winner_id = game.results.winner;
                                     }
                                 });
                             });
@@ -572,8 +566,8 @@ if (!$(".faceit_maps")[0]) {
                                     HS = 0,
                                     KD = 0,
                                     WR = 0,
-                                    count = 0,
-                                    elo = 0;
+                                    elo = 0,
+                                    count = 0;
 
                                 $.each(data, function(match) {
                                     var s = 0;
@@ -582,7 +576,7 @@ if (!$(".faceit_maps")[0]) {
 
                                 for (i = 0; i < data.length; i++) {
                                     if (data[i].gameMode == '5v5') {
-                                        count = count + 1;
+                                        count++;
                                         HS = parseInt(data[i].c4 * 100) + HS;
                                         KD = parseInt(data[i].c2 * 100) + KD;
                                     }
@@ -612,15 +606,8 @@ if (!$(".faceit_maps")[0]) {
                                             $('.LoadingWrapper').hide();
                                             $('.faceit_content').prepend(
                                                 showcaseLayout(
-                                                    lifetime['Matches'],
-                                                    lifetime['Win Rate %'],
-                                                    lifetime['Average Headshots %'],
-                                                    lifetime['Average K/D Ratio'],
-                                                    lifetime['Longest Win Streak'],
-                                                    lifetime['Current Win Streak'],
-                                                    profile_data.nickname,
-                                                    profile_data.cover_image,
-                                                    profile_data.membership_type,
+                                                    lifetime,
+                                                    profile_data,
                                                     faceit_elo,
                                                     skill_level,
                                                     win,
@@ -635,14 +622,7 @@ if (!$(".faceit_maps")[0]) {
                                                 if (map.mode == '5v5') {
                                                     if (MAPS_VETO.includes(map.label)) {
                                                         $('.faceit_maps').append(
-                                                            mapsLayout(
-                                                                map.label,
-                                                                map.img_small,
-                                                                map.stats['Average K/D Ratio'],
-                                                                map.stats['Win Rate %'],
-                                                                map.stats['Wins'],
-                                                                map.stats['Matches']
-                                                            )
+                                                            mapsLayout(map)
                                                         );
                                                     }
                                                 }
@@ -695,6 +675,6 @@ $(document).on('click', '.faceit_stats_load', function() {
 });
 // Open match details
 $(document).on('click', '.filter_tag_button_ctn', function() {
-    $(this).children().children().children().toggleClass('down').toggleClass('up');
+    $(this).find('.btn_details_arrow').toggleClass('down').toggleClass('up');
     $('tr[data-id=' + $(this).parents('.faceit_row').data('match-id') + ']').toggle();
 });
