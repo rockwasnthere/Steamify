@@ -333,116 +333,116 @@ function getLastGames() {
                         if (match_list[m].leaver) {
                             $('.faceit_stats_tbody').append(
                                 `<tr data-match-id="` + m + `" class="faceit_row faceit_stats_leaver">
-                                        <td style="text-align:center;font-weight:bold;padding-left:0;">
-                                            A
-                                        </td>
-                                        <td colspan="9" style="text-align:center;font-weight:bold;padding-left:0;">
-                                            ABANDONED
-                                        </td>
-                                        <td>
-                                            <a href="https://faceit.com/en/csgo/room/` + match_list[m].match.id + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
-                                                <div class="btn_black btn_details btn_small">
-                                                    <span>🔗</span>
-                                                </div>
-                                            </a>
-                                        </td>
-                                    </tr>`);
+                                    <td style="text-align:center;font-weight:bold;padding-left:0;">
+                                        A
+                                    </td>
+                                    <td colspan="9" style="text-align:center;font-weight:bold;padding-left:0;">
+                                        ABANDONED
+                                    </td>
+                                    <td>
+                                        <a href="https://faceit.com/en/csgo/room/` + match_list[m].match.id + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
+                                            <div class="btn_black btn_details btn_small">
+                                                <span>🔗</span>
+                                            </div>
+                                        </a>
+                                    </td>
+                                </tr>`);
                         } else {
                             $('.faceit_stats_tbody').append(`
-                                            <tr data-match-id="` + m + `" class="faceit_row faceit_stats_` + ((is_winner === 1) ? `win` : `lose`) + `">
-                                                <td style="text-align:center;font-weight:bold;padding-left:0;">
-                                                    ` + ((is_winner === 1) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`) + `
-                                                </td>
-                                                <td>
-                                                    <span>` + match_list[m].team_name + `</span>
-                                                </td>
-                                                <td>
-                                                    <span>` + match_list[m].score + `</span>
-                                                </td>
-                                                <td>
-                                                    <span>` + match_list[m].kills + `-` + match_list[m].assists + `-` + match_list[m].deaths + `</span>
-                                                </td>
+                                <tr data-match-id="` + m + `" class="faceit_row faceit_stats_` + ((is_winner === 1) ? `win` : `lose`) + `">
+                                    <td style="text-align:center;font-weight:bold;padding-left:0;">
+                                        ` + ((is_winner === 1) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`) + `
+                                    </td>
+                                    <td>
+                                        <span>` + match_list[m].team_name + `</span>
+                                    </td>
+                                    <td>
+                                        <span>` + match_list[m].score + `</span>
+                                    </td>
+                                    <td>
+                                        <span>` + match_list[m].kills + `-` + match_list[m].assists + `-` + match_list[m].deaths + `</span>
+                                    </td>
 
-                                                <td>
-                                                    <span class="stat_` + ((match_list[m].kda < 1) ? 'decrease' : 'increase') + `">` + match_list[m].kda + `</span>
-                                                </td>
-                                                <td>
-                                                    <span class="stat_` + ((match_list[m].kr < 1) ? 'decrease' : 'increase') + `">` + match_list[m].kr + `</span>
-                                                </td>
+                                    <td>
+                                        <span class="stat_` + ((match_list[m].kda < 1) ? 'decrease' : 'increase') + `">` + match_list[m].kda + `</span>
+                                    </td>
+                                    <td>
+                                        <span class="stat_` + ((match_list[m].kr < 1) ? 'decrease' : 'increase') + `">` + match_list[m].kr + `</span>
+                                    </td>
 
-                                                <td>
-                                                    <span>` + match_list[m].hs_percent + `% (` + match_list[m].hs + `)</span>
-                                                </td>
+                                    <td>
+                                        <span>` + match_list[m].hs_percent + `% (` + match_list[m].hs + `)</span>
+                                    </td>
 
 
-                                                <td>
-                                                    <span>` + match_list[m].map + `</span>
-                                                </td>
-                                                <td>
-                                                    <span>` + match_list[m].finished_at + `</span>
-                                                </td>
-                                                <td>
-                                                    <span>` +
-                                                    ((match_list[m].elo === undefined) ?
-                                                        `---` :
-                                                        match_list[m].elo + ` <span class="stat_` +
-                                                        (
-                                                            (is_winner === 1) ?
-                                                            `increase">` :
-                                                            `decrease">`
-                                                        ) +
-                                                        (((m === (global_data.length - 1)) ? `` : (match_list[m + 1].elo === undefined) ?
-                                                            `` : `(` +
-                                                            (((match_list[m].elo - match_list[m + 1].elo) < 0) ?
-                                                                match_list[m].elo - match_list[m + 1].elo :
-                                                                `+` + (match_list[m].elo - match_list[m + 1].elo)) + `)</span>`))) +
-                                                    `</span>
-                                                </td>
-                                                <td>
-                                                    <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
-                                                        <div class="btn_black btn_details btn_small">
-                                                            <span>
-                                                                <span class="btn_details_arrow down"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header">
-                                                <th colspan=7>
-                                                    <span class="stat_` + ((winner_id === 'faction1') ? `increase` : `decrease`) + `">` + team_A.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
-                                                </th>
-                                                <th colspan=3>
-                                                    <span>
-                                                        FINAL SCORE: <span class="text-white">` + team_A.team_stats['Final Score'] + ` <span data-tooltip-html="FIRST HALF">(` + team_A.team_stats['First Half Score'] + `</span>:<span data-tooltip-html="SECOND HALF">` + team_A.team_stats['Second Half Score'] + `</span> | <span data-tooltip-html="OVERTIME">` + team_A.team_stats['Overtime score'] + `</span>)
-                                                    </span>
-                                                </th>
-                                                <th>` +
-                                ((match_list[m].demo_url === 'empty') ?
-                                    `` :
-                                    `<a href="` + match_list[m].demo_url + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
-                                                        <div class="btn_black btn_details btn_small">
-                                                            <span>
-                                                                <span class="ico16 btn_active bluearrow_down"></span>
-                                                            </span>
-                                                        </div>
-                                                    </a>`) + `
-                                                </th>
-                                            </tr>
-                                            <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_A">` + additional_th + `</tr>
-                                            <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header">
-                                                <th colspan=7>
-                                                    <span class="stat_` + ((winner_id === 'faction2') ? `increase` : `decrease`) + `">` + team_B.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
-                                                </th>
-                                                <th colspan=3>
-                                                    <span>
-                                                        FINAL SCORE: <span class="text-white">` + team_B.team_stats['Final Score'] + ` <span data-tooltip-html="FIRST HALF">(` + team_B.team_stats['First Half Score'] + `</span>:<span data-tooltip-html="SECOND HALF">` + team_B.team_stats['Second Half Score'] + `</span> | <span data-tooltip-html="OVERTIME">` + team_B.team_stats['Overtime score'] + `</span>)
-                                                    </span>
-                                                </th>
-                                                <th>
-                                                </th>
-                                            </tr>
-                                            <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_B">` + additional_th + `</tr>`
+                                    <td>
+                                        <span>` + match_list[m].map + `</span>
+                                    </td>
+                                    <td>
+                                        <span>` + match_list[m].finished_at + `</span>
+                                    </td>
+                                    <td>
+                                        <span>` +
+                                        ((match_list[m].elo === undefined) ?
+                                            `---` :
+                                            match_list[m].elo + ` <span class="stat_` +
+                                            (
+                                                (is_winner === 1) ?
+                                                `increase">` :
+                                                `decrease">`
+                                            ) +
+                                            (((m === (global_data.length - 1)) ? `` : (match_list[m + 1].elo === undefined) ?
+                                                `` : `(` +
+                                                (((match_list[m].elo - match_list[m + 1].elo) < 0) ?
+                                                    match_list[m].elo - match_list[m + 1].elo :
+                                                    `+` + (match_list[m].elo - match_list[m + 1].elo)) + `)</span>`))) +
+                                        `</span>
+                                    </td>
+                                    <td>
+                                        <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
+                                            <div class="btn_black btn_details btn_small">
+                                                <span>
+                                                    <span class="btn_details_arrow down"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header">
+                                    <th colspan=7>
+                                        <span class="stat_` + ((winner_id === 'faction1') ? `increase` : `decrease`) + `">` + team_A.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
+                                    </th>
+                                    <th colspan=3>
+                                        <span>
+                                            FINAL SCORE: <span class="text-white">` + team_A.team_stats['Final Score'] + ` <span data-tooltip-html="FIRST HALF">(` + team_A.team_stats['First Half Score'] + `</span>:<span data-tooltip-html="SECOND HALF">` + team_A.team_stats['Second Half Score'] + `</span> | <span data-tooltip-html="OVERTIME">` + team_A.team_stats['Overtime score'] + `</span>)
+                                        </span>
+                                    </th>
+                                    <th>` +
+				                    ((match_list[m].demo_url === 'empty') ?
+				                        `` :
+				                        `<a href="` + match_list[m].demo_url + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
+                                            <div class="btn_black btn_details btn_small">
+                                                <span>
+                                                    <span class="ico16 btn_active bluearrow_down"></span>
+                                                </span>
+                                            </div>
+                                        </a>`) + `
+                                    </th>
+                                </tr>
+                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_A">` + additional_th + `</tr>
+                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header">
+                                    <th colspan=7>
+                                        <span class="stat_` + ((winner_id === 'faction2') ? `increase` : `decrease`) + `">` + team_B.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
+                                    </th>
+                                    <th colspan=3>
+                                        <span>
+                                            FINAL SCORE: <span class="text-white">` + team_B.team_stats['Final Score'] + ` <span data-tooltip-html="FIRST HALF">(` + team_B.team_stats['First Half Score'] + `</span>:<span data-tooltip-html="SECOND HALF">` + team_B.team_stats['Second Half Score'] + `</span> | <span data-tooltip-html="OVERTIME">` + team_B.team_stats['Overtime score'] + `</span>)
+                                        </span>
+                                    </th>
+                                    <th>
+                                    </th>
+                                </tr>
+                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_B">` + additional_th + `</tr>`
                             );
                             $.each(team_A.players, function(players) {
                                 playersLayout(m, 'A', team_A.players[players]);
@@ -457,7 +457,7 @@ function getLastGames() {
                 }
             }
         });
-
+		// Get match finish time and demo link
         $.getJSON({
             url: API_URL + '/matches/' + game.match_id,
             success: function(data) {
