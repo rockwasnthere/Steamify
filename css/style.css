@@ -202,10 +202,6 @@
     width: 100%;
 }
 
-.white {
-    color: #fff !important;
-}
-
 .game_info_faceit_header {
     text-align: center;
     background-color: #3F51B5;
@@ -229,7 +225,7 @@
 }
 
 .favorite_badge_description {
-    padding-top: 4px!important;
+    padding-top: 4px !important;
 }
 
 .favorite_bi_win {
@@ -283,7 +279,19 @@
 }
 
 .text-white {
-    color: #fff;
+    color: #fff !important;
+}
+
+.text-primary {
+    color: #2196f3 !important;
+}
+
+.text-faceit {
+    color: #ff5722 !important;
+}
+
+.links {
+    color: transparent !important;
 }
 
 .faceit_stats_details>td:first-child {

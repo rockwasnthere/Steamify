@@ -1,65 +1,50 @@
 const
-	// Bearer faceit client side key
+    // Bearer faceit client side key
     BEARER = 'Bearer 2ca58611-1bf4-4b37-b0a9-042631fd9f80',
     // Steam base id64
     IDENT = '76561197960265728',
     // Faceit API v4 url
     API_URL = 'https://open.faceit.com/data/v4',
 
+    // sotsad emoticon :P
+    E_SOTSAD = '<img alt=":sotsad:" src="'+ chrome.extension.getURL('images/icon/sotsad.png') + '">',
+
     // No faceit profile
     L_NOT_FOUND =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "Faceit account wasn`t found"
-        }).append($('<img>', {
-            alt: ":sotsad:",
-            class: "emoticon",
-            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-        })),
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "Faceit account wasn`t found"
+    }).append(E_SOTSAD),
 
     // No available matches
     L_MATCHES_NOT_FOUND =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "No matches found"
-        }).append($('<img>', {
-            alt: ":sotsad:",
-            class: "emoticon",
-            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-        })),
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "No matches found"
+    }).append(E_SOTSAD),
 
     // Preloader bar
     L_LOADING =
-        $('<div>', {
-            class: "LoadingWrapper wrapper-orange"
-        }).append($('<div>', { class: "LoadingThrobber" })
-            .append($('<div>', { class: "Bar Bar1" }))
-            .append($('<div>', { class: "Bar Bar2" }))
-            .append($('<div>', { class: "Bar Bar3" }))),
+    $('<div>', {
+        class: "LoadingWrapper wrapper-orange"
+    }).append($('<div>', { class: "LoadingThrobber" })
+        .append($('<div>', { class: "Bar Bar1" }))
+        .append($('<div>', { class: "Bar Bar2" }))
+        .append($('<div>', { class: "Bar Bar3" }))),
 
     // An error happend
     L_ERROR =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "An error"
-        })
-        .append($('<img>', {
-            alt: ":sotsad:",
-            class: "emoticon",
-            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-        })),
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "An error"
+    }).append(E_SOTSAD),
 
     // No csgo profile on faceit
     L_NO_CSGO =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "No CSGO stats on Faceit"
-        })
-        .append($('<img>', {
-            alt: ":sotsad:",
-            class: "emoticon",
-            src: "https://steamcommunity-a.akamaihd.net/economy/emoticon/sotsad"
-        })),
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "No CSGO stats on Faceit"
+    }).append(E_SOTSAD),
 
     // Current maps pool
     MAPS_VETO = [
@@ -71,7 +56,7 @@ const
         'de_vertigo',
         'de_overpass'
     ],
-    
+
     additional_th = '<th colspan=7>PLAYER</th><th>MVPs</th><th>TRIPLE</th><th>QUADRO</th><th>PENTA</th>';
 
 let avgHS = 0,
@@ -81,7 +66,7 @@ let avgHS = 0,
     demo_url,
     faceit_url,
     finished_at,
-    global_data,
+    games_list,
     faceit_playerID,
     match_list = [],
     list_of_players = [];
@@ -100,26 +85,26 @@ function showcaseLayout(lifetime, profile, elo, skill_level, win, lose, last20HS
             <div class="showcase_stats">
                 <div class="showcase_faceit">
                     <a class="showcase_stat showcase_stat_faceit">
-                        <div class="value"><span class="white">LAST 20</span> / OVERALL</div>
+                        <div class="value"><span class="text-white">LAST 20</span> / OVERALL</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Matches played w/o leaves">
                         <div class="value">` + lifetime['Matches'] + `</div>
                         <div class="label">MATCHES</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="white">` + Math.round((win / 20) * 100) + `</span> / ` + lifetime['Win Rate %'] + `%</div>
+                        <div class="value"><span class="text-white">` + Math.round((win / 20) * 100) + `</span> / ` + lifetime['Win Rate %'] + `%</div>
                         <div class="label">WINRATE</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="white">` + last20HS + `</span> / ` + lifetime['Average Headshots %'] + `%</div>
+                        <div class="value"><span class="text-white">` + last20HS + `</span> / ` + lifetime['Average Headshots %'] + `%</div>
                         <div class="label">AVG HS%</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="white">` + last20KD + `</span> / ` + lifetime['Average K/D Ratio'] + `</div>
+                        <div class="value"><span class="text-white">` + last20KD + `</span> / ` + lifetime['Average K/D Ratio'] + `</div>
                         <div class="label">AVG K/D</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Current streak / Max. streak">
-                        <div class="value">` + `<span class="` + ((lifetime['Current Win Streak'] == 0) ? 'lose' : 'win') + `">` + lifetime['Current Win Streak'] + `</span>` + ` / ` + lifetime['Longest Win Streak'] + `</div>
+                        <div class="value">` + `<span class="` + ((lifetime['Current Win Streak'] === 0) ? 'lose' : 'win') + `">` + lifetime['Current Win Streak'] + `</span>` + ` / ` + lifetime['Longest Win Streak'] + `</div>
                         <div class="label">STREAK</div>
                     </a>
                 </div>
@@ -133,11 +118,11 @@ function showcaseLayout(lifetime, profile, elo, skill_level, win, lose, last20HS
                         }
                         </style>
                         <div class="favorite_badge_icon" data-tooltip-html="Level and ELO on Faceit">
-                            <a class="whiteLink" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">
+                            <a class="text-white" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">
                                 <img src="` + chrome.extension.getURL('images/lvl_' + skill_level + '.svg') + `" class="badge_icon small"> </a> </div>
                                 <div class="favorite_badge_description">
                                     <div class="name ellipsis">
-                                        <a class="whiteLink" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">` + profile.nickname + `</a>
+                                        <a class="text-white" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">` + profile.nickname + `</a>
                                     </div>
                                     Membership: ` + profile.membership_type + `<br>Last 20 games:
                                 <div class="favorite_bi_win">` + win + `</div>:<div class="favorite_bi_lose">` + lose + `</div>
@@ -178,7 +163,6 @@ function statsLayout() {
                 </tr>
             </thead>
             <tbody class="faceit_stats_tbody">
-                <!-- <a name="osversion"></a> -->
             </tbody>
         </table>
     </div>`;
@@ -187,8 +171,9 @@ function statsLayout() {
 function playersLayout(match_id, team, player) {
     return $('.' + match_id + '_team_' + team).after(`
         <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
-            <td colspan=3>
-                <span><a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank"></span>` + player.nickname + `</span></a>
+            <td colspan=3 class="links">
+                <a class="text-primary" data-player_id="` + player.player_id + `"><span>[Steam]</span></a>
+                <a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank" class="text-faceit"><span>` + player.nickname + `</span></a>
             </td>
             <td>
                 <span>` + player.player_stats['Kills'] + `-` + player.player_stats['Assists'] + `-` + player.player_stats['Deaths'] + `</span>
@@ -253,16 +238,16 @@ function getLastGames() {
 
     var cnt = 0;
 
-    $.each(global_data, function(game) {
+    $.each(games_list, game => {
 
-        var counter = game;
-        var game = global_data[game];
+        var counter = game,
+            game = games_list[game];
 
         // Get match detailed data to create a table
         $.getJSON({
             url: API_URL + '/matches/' + game.match_id + '/stats',
-            success: function(data) {
-                $.each(data.rounds, function(stats) {
+            success: data => {
+                $.each(data.rounds, stats => {
 
                     let match = data.rounds[stats],
                         round_stats = match.round_stats,
@@ -273,14 +258,14 @@ function getLastGames() {
                         players_list = [];
 
                     // List of teams in match
-                    $.each(match.teams, function(teams) {
+                    $.each(match.teams, teams => {
                         let team = match.teams[teams],
                             team_name = team.team_stats.Team;
 
                         match_list[counter].match.teams = [match.teams];
                         match_list[counter].leaver = 0;
 
-                        $.each(team.players, function(players) {
+                        $.each(team.players, players => {
                             // List of players in match
                             let player = team.players[players],
                                 player_stats = player.player_stats;
@@ -314,25 +299,25 @@ function getLastGames() {
                     if ($.inArray(faceit_playerID, players_list) <= -1) { match_list[counter].leaver = 1 }
                 });
             },
-            complete: function() {
+            complete: () => {
                 $('.faceit_stats_content').attr('style', 'margin-top: 32px !important');
                 $('.faceit_stats').show();
                 $('.faceit_stats_load').text('LOADING... [' + cnt + ']');
 
-                if (cnt === (global_data.length - 1)) {
+                if (cnt === (games_list.length - 1)) {
 
-                    $('.faceit_stats_load').text('LAST ' + (global_data.length) + ' GAMES');
+                    $('.faceit_stats_load').text('LAST ' + (games_list.length) + ' GAMES');
 
-                    $.each(match_list, function(m) {
+                    $.each(match_list, match_id => {
 
-                        let team_A = match_list[m].match.teams[0][0],
-                            team_B = match_list[m].match.teams[0][1],
-                            is_winner = match_list[m].match.winner,
-                            winner_id = match_list[m].match.winner_id;
+                        let team_A = match_list[match_id].match.teams[0][0],
+                            team_B = match_list[match_id].match.teams[0][1],
+                            is_winner = match_list[match_id].match.winner,
+                            winner_id = match_list[match_id].match.winner_id;
 
-                        if (match_list[m].leaver) {
+                        if (match_list[match_id].leaver) {
                             $('.faceit_stats_tbody').append(
-                                `<tr data-match-id="` + m + `" class="faceit_row faceit_stats_leaver">
+                                `<tr data-match-id="` + match_id + `" class="faceit_row faceit_stats_leaver">
                                     <td style="text-align:center;font-weight:bold;padding-left:0;">
                                         A
                                     </td>
@@ -340,7 +325,7 @@ function getLastGames() {
                                         ABANDONED
                                     </td>
                                     <td>
-                                        <a href="https://faceit.com/en/csgo/room/` + match_list[m].match.id + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
+                                        <a href="https://faceit.com/en/csgo/room/` + match_list[match_id].match.id + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
                                             <div class="btn_black btn_details btn_small">
                                                 <span>🔗</span>
                                             </div>
@@ -349,54 +334,54 @@ function getLastGames() {
                                 </tr>`);
                         } else {
                             $('.faceit_stats_tbody').append(`
-                                <tr data-match-id="` + m + `" class="faceit_row faceit_stats_` + ((is_winner === 1) ? `win` : `lose`) + `">
+                                <tr data-match-id="` + match_id + `" class="faceit_row faceit_stats_` + ((is_winner === 1) ? `win` : `lose`) + `">
                                     <td style="text-align:center;font-weight:bold;padding-left:0;">
                                         ` + ((is_winner === 1) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`) + `
                                     </td>
                                     <td>
-                                        <span>` + match_list[m].team_name + `</span>
+                                        <span>` + match_list[match_id].team_name + `</span>
                                     </td>
                                     <td>
-                                        <span>` + match_list[m].score + `</span>
+                                        <span>` + match_list[match_id].score + `</span>
                                     </td>
                                     <td>
-                                        <span>` + match_list[m].kills + `-` + match_list[m].assists + `-` + match_list[m].deaths + `</span>
-                                    </td>
-
-                                    <td>
-                                        <span class="stat_` + ((match_list[m].kda < 1) ? 'decrease' : 'increase') + `">` + match_list[m].kda + `</span>
-                                    </td>
-                                    <td>
-                                        <span class="stat_` + ((match_list[m].kr < 1) ? 'decrease' : 'increase') + `">` + match_list[m].kr + `</span>
+                                        <span>` + match_list[match_id].kills + `-` + match_list[match_id].assists + `-` + match_list[match_id].deaths + `</span>
                                     </td>
 
                                     <td>
-                                        <span>` + match_list[m].hs_percent + `% (` + match_list[m].hs + `)</span>
+                                        <span class="stat_` + ((match_list[match_id].kda < 1) ? 'decrease' : 'increase') + `">` + match_list[match_id].kda + `</span>
+                                    </td>
+                                    <td>
+                                        <span class="stat_` + ((match_list[match_id].kr < 1) ? 'decrease' : 'increase') + `">` + match_list[match_id].kr + `</span>
+                                    </td>
+
+                                    <td>
+                                        <span>` + match_list[match_id].hs_percent + `% (` + match_list[match_id].hs + `)</span>
                                     </td>
 
 
                                     <td>
-                                        <span>` + match_list[m].map + `</span>
+                                        <span>` + match_list[match_id].map + `</span>
                                     </td>
                                     <td>
-                                        <span>` + match_list[m].finished_at + `</span>
+                                        <span>` + match_list[match_id].finished_at + `</span>
                                     </td>
                                     <td>
                                         <span>` +
-                                        ((match_list[m].elo === undefined) ?
-                                            `---` :
-                                            match_list[m].elo + ` <span class="stat_` +
-                                            (
-                                                (is_winner === 1) ?
-                                                `increase">` :
-                                                `decrease">`
-                                            ) +
-                                            (((m === (global_data.length - 1)) ? `` : (match_list[m + 1].elo === undefined) ?
-                                                `` : `(` +
-                                                (((match_list[m].elo - match_list[m + 1].elo) < 0) ?
-                                                    match_list[m].elo - match_list[m + 1].elo :
-                                                    `+` + (match_list[m].elo - match_list[m + 1].elo)) + `)</span>`))) +
-                                        `</span>
+                                ((match_list[match_id].elo === undefined) ?
+                                    `---` :
+                                    match_list[match_id].elo + ` <span class="stat_` +
+                                    (
+                                        (is_winner === 1) ?
+                                        `increase">` :
+                                        `decrease">`
+                                    ) +
+                                    (((match_id === (games_list.length - 1)) ? `` : (match_list[match_id + 1].elo === undefined) ?
+                                        `` : `(` +
+                                        (((match_list[match_id].elo - match_list[match_id + 1].elo) < 0) ?
+                                            match_list[match_id].elo - match_list[match_id + 1].elo :
+                                            `+` + (match_list[match_id].elo - match_list[match_id + 1].elo)) + `)</span>`))) +
+                                `</span>
                                     </td>
                                     <td>
                                         <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
@@ -408,7 +393,7 @@ function getLastGames() {
                                         </div>
                                     </td>
                                 </tr>
-                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header">
+                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header">
                                     <th colspan=7>
                                         <span class="stat_` + ((winner_id === 'faction1') ? `increase` : `decrease`) + `">` + team_A.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
                                     </th>
@@ -418,9 +403,9 @@ function getLastGames() {
                                         </span>
                                     </th>
                                     <th>` +
-				                    ((match_list[m].demo_url === 'empty') ?
-				                        `` :
-				                        `<a href="` + match_list[m].demo_url + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
+                                ((match_list[match_id].demo_url === 'empty') ?
+                                    `` :
+                                    `<a href="` + match_list[match_id].demo_url + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
                                             <div class="btn_black btn_details btn_small">
                                                 <span>
                                                     <span class="ico16 btn_active bluearrow_down"></span>
@@ -429,8 +414,8 @@ function getLastGames() {
                                         </a>`) + `
                                     </th>
                                 </tr>
-                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_A">` + additional_th + `</tr>
-                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header">
+                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header ` + match_id + `_team_A">` + additional_th + `</tr>
+                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header">
                                     <th colspan=7>
                                         <span class="stat_` + ((winner_id === 'faction2') ? `increase` : `decrease`) + `">` + team_B.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
                                     </th>
@@ -442,13 +427,13 @@ function getLastGames() {
                                     <th>
                                     </th>
                                 </tr>
-                                <tr data-id="` + m + `" class="nonresponsive_hidden faceit_stats_details_header ` + m + `_team_B">` + additional_th + `</tr>`
+                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header ` + match_id + `_team_B">` + additional_th + `</tr>`
                             );
-                            $.each(team_A.players, function(players) {
-                                playersLayout(m, 'A', team_A.players[players]);
+                            $.each(team_A.players.sort((a, b) => (parseInt(a['player_stats'].Kills) >= parseInt(b['player_stats'].Kills)) ? 1 : -1), players => {
+                                playersLayout(match_id, 'A', team_A.players[players]);
                             });
-                            $.each(team_B.players, function(players) {
-                                playersLayout(m, 'B', team_B.players[players]);
+                            $.each(team_B.players.sort((a, b) => (parseInt(a['player_stats'].Kills) >= parseInt(b['player_stats'].Kills)) ? 1 : -1), players => {
+                                playersLayout(match_id, 'B', team_B.players[players]);
                             });
                         }
                     });
@@ -457,36 +442,46 @@ function getLastGames() {
                 }
             }
         });
-		// Get match finish time and demo link
+        // Get match finish time and demo link
         $.getJSON({
             url: API_URL + '/matches/' + game.match_id,
-            success: function(data) {
+            success: data => {
                 match_list[counter].finished_at = new Date(data.finished_at * 1000).toLocaleString('en-GB');
             },
-            error: function(data) {
+            error: data => {
                 match_list[counter].finished_at = '---';
             },
-            complete: function(data) {
+            complete: data => {
                 try { match_list[counter].demo_url = data.responseJSON.demo_url[0]; } catch (e) { match_list[counter].demo_url = 'empty'; }
             }
         });
     });
 }
+// Get player steam_id_64
+function getSteamId64(player) {
+    $.getJSON({
+        url: API_URL + '/players/' + player.data('player_id'),
+        success: data => {
+            $(player).css('cursor','pointer');
+            window.open('https://steamcommunity.com/profiles/' + data.steam_id_64, "_blank", "noopener,noreferrer");
+        },
+        beforeSend: () => {
+            $(player).css('cursor','wait');
+        }
+    });
+}
 
 if (!$(".faceit_maps")[0]) {
-
-    // Add table css from steam store
-    $('head').append('<link href="https://steamstore-a.akamaihd.net/public/css/styles_hwsurvey.css?v=duJJnJSUh9Ly&amp;l=english" rel="stylesheet" type="text/css">');
 
     // Get steamid
     let steam_id = $.parseJSON('{"' + $('.responsive_page_template_content script').html().split('{"').pop().split('"}')[0] + '"}').steamid;
 
     $.getJSON({
         url: API_URL + '/search/players?nickname=' + steam_id + '&offset=0&limit=1',
-        success: function(data) {
+        success: data => {
 
             // If faceit profile not found return error
-            if (Object.keys(data.items).length == 0) {
+            if (data.items.length === 0) {
                 $('.LoadingWrapper').hide();
                 $('.profile_content').prepend(L_NOT_FOUND);
                 return;
@@ -505,7 +500,7 @@ if (!$(".faceit_maps")[0]) {
                     headers: {
                         'Authorization': null
                     },
-                    success: function(data) {
+                    success: data => {
                         banned = data.payload[0].reason;
                     }
                 });
@@ -514,20 +509,20 @@ if (!$(".faceit_maps")[0]) {
             // Get last 20 games
             $.getJSON({
                 url: API_URL + '/players/' + faceit_playerID + '/history?from=0&game=csgo&limit=20',
-                success: function(data) {
+                success: data => {
 
-                    global_data = data.items;
+                    games_list = data.items;
 
-                    if (global_data.length > 0) {
+                    if (games_list.length > 0) {
                         $('.private_profile').addClass('DefaultTheme');
                         $('.private_profile .profile_content').css('padding-bottom', 8);
                         $('.profile_content').css('min-height', 'auto').prepend('<div class="showcase_content_bg showcase_stats_row faceit_content"></div>');
                         $('.faceit_content').append(statsLayout());
 
-                        $.each(global_data, function(game) {
+                        $.each(games_list, game => {
 
-                            var counter = game;
-                            var game = global_data[game];
+                            var counter = game,
+                                game = games_list[game];
 
                             match_list.push({
                                 "match": {
@@ -536,9 +531,9 @@ if (!$(".faceit_maps")[0]) {
                                 }
                             });
 
-                            $.each(game.teams, function(players) {
-                                $.each(game.teams[players].players, function(player) {
-                                    if (game.teams[players].players[player].player_id == faceit_playerID) {
+                            $.each(game.teams, players => {
+                                $.each(game.teams[players].players, player => {
+                                    if (game.teams[players].players[player].player_id === faceit_playerID) {
                                         if (game.results.winner === players) {
                                             win++;
                                             match_list[counter].match.winner = 1;
@@ -551,8 +546,8 @@ if (!$(".faceit_maps")[0]) {
                                 });
                             });
                         });
-                        if (global_data.length < size) {
-                            size = global_data.length;
+                        if (games_list.length < size) {
+                            size = games_list.length;
                         }
                         // Get and calculate last 20 games stats
                         $.getJSON({
@@ -560,7 +555,7 @@ if (!$(".faceit_maps")[0]) {
                             headers: {
                                 'Authorization': null
                             },
-                            success: function(data) {
+                            success: data => {
 
                                 let K = 0,
                                     HS = 0,
@@ -569,13 +564,15 @@ if (!$(".faceit_maps")[0]) {
                                     elo = 0,
                                     count = 0;
 
-                                $.each(data, function(match) {
-                                    var s = 0;
-                                    while (s != data.length - 1) {((match_list[match + s].match.id === data[match].matchId) ? (match_list[match + s].elo = data[match].elo, s = data.length - 1) : s++);}
+                                $.each(data, match => {
+                                    var index = 0;
+                                    while (index != data.length - 1) {
+                                        ((match_list[match + index].match.id === data[match].matchId) ? (match_list[match + index].elo = data[match].elo, index = data.length - 1) : index++);
+                                    }
                                 });
 
                                 for (i = 0; i < data.length; i++) {
-                                    if (data[i].gameMode == '5v5') {
+                                    if (data[i].gameMode === '5v5') {
                                         count++;
                                         HS = parseInt(data[i].c4 * 100) + HS;
                                         KD = parseInt(data[i].c2 * 100) + KD;
@@ -589,19 +586,19 @@ if (!$(".faceit_maps")[0]) {
                         // Get lifetime stats
                         $.getJSON({
                             url: API_URL + '/players/' + faceit_playerID,
-                            success: function(data) {
+                            success: data => {
+                                // If csgo profile exists
                                 if (data.games['csgo']) {
-
                                     let profile_data = data,
                                         faceit_elo = profile_data.games['csgo'].faceit_elo,
                                         skill_level = profile_data.games['csgo'].skill_level;
-
+                                    // Get csgo stats
                                     $.getJSON({
                                         url: API_URL + '/players/' + faceit_playerID + '/stats/csgo',
-                                        success: function(data) {
+                                        success: data => {
 
                                             let lifetime = data.lifetime,
-                                                segments = data.segments;
+                                                segments = data.segments.sort((a, b) => (parseInt(a['stats'].Matches) <= parseInt(b['stats'].Matches)) ? 1 : -1);
 
                                             $('.LoadingWrapper').hide();
                                             $('.faceit_content').prepend(
@@ -617,9 +614,9 @@ if (!$(".faceit_maps")[0]) {
                                                 )
                                             );
                                             // Get maps detailed stats
-                                            $.each(segments, function(map) {
+                                            $.each(segments, map => {
                                                 var map = segments[map];
-                                                if (map.mode == '5v5') {
+                                                if (map.mode === '5v5') {
                                                     if (MAPS_VETO.includes(map.label)) {
                                                         $('.faceit_maps').append(
                                                             mapsLayout(map)
@@ -636,7 +633,7 @@ if (!$(".faceit_maps")[0]) {
                                                 $('.faceit_content').css('padding-top', '28px').prepend('<div class="banned" data-tooltip-html="Ban reason">' + banned + '</div>')
                                             }
                                         },
-                                        error: function(data) {
+                                        error: data => {
                                             if (data.status === 404) {
                                                 $('.LoadingWrapper').hide();
                                                 $('.profile_content').prepend(L_NO_CSGO);
@@ -658,17 +655,17 @@ if (!$(".faceit_maps")[0]) {
                 }
             });
         },
-        complete: function() {
+        complete: () => {
             $('.faceit_content').show();
         },
         // Show preloader on request
-        beforeSend: function(data) {
+        beforeSend: data => {
             $('.profile_content').prepend(L_LOADING);
         }
     });
 }
 // Get last 20 games when click on button
-$(document).on('click', '.faceit_stats_load', function() {
+$(document).on('click', '.faceit_stats_load', () => {
     if (!$(".faceit_row")[0]) {
         getLastGames();
     }
@@ -677,4 +674,8 @@ $(document).on('click', '.faceit_stats_load', function() {
 $(document).on('click', '.filter_tag_button_ctn', function() {
     $(this).find('.btn_details_arrow').toggleClass('down').toggleClass('up');
     $('tr[data-id=' + $(this).parents('.faceit_row').data('match-id') + ']').toggle();
+});
+// Open player steam profile
+$(document).on('click', '.text-primary', function() {
+    getSteamId64($(this));
 });
