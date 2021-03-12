@@ -7,7 +7,7 @@ const
     API_URL = 'https://open.faceit.com/data/v4',
 
     // sotsad emoticon :P
-    E_SOTSAD = '<img alt=":sotsad:" src="'+ chrome.extension.getURL('images/icon/sotsad.png') + '">',
+    E_SOTSAD = `<img alt=":sotsad:" src="${chrome.extension.getURL('images/icon/sotsad.png')}">`,
 
     // No faceit profile
     L_NOT_FOUND =
@@ -88,44 +88,44 @@ function showcaseLayout(lifetime, profile, elo, skill_level, win, lose, last20HS
                         <div class="value"><span class="text-white">LAST 20</span> / OVERALL</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Matches played w/o leaves">
-                        <div class="value">` + lifetime['Matches'] + `</div>
+                        <div class="value">${lifetime['Matches']}</div>
                         <div class="label">MATCHES</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="text-white">` + Math.round((win / 20) * 100) + `</span> / ` + lifetime['Win Rate %'] + `%</div>
+                        <div class="value"><span class="text-white">${Math.round((win / 20) * 100)}</span> / ${lifetime['Win Rate %']}%</div>
                         <div class="label">WINRATE</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="text-white">` + last20HS + `</span> / ` + lifetime['Average Headshots %'] + `%</div>
+                        <div class="value"><span class="text-white">${last20HS}</span> / ${lifetime['Average Headshots %']}%</div>
                         <div class="label">AVG HS%</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="text-white">` + last20KD + `</span> / ` + lifetime['Average K/D Ratio'] + `</div>
+                        <div class="value"><span class="text-white">${last20KD}</span> / ${lifetime['Average K/D Ratio']}</div>
                         <div class="label">AVG K/D</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Current streak / Max. streak">
-                        <div class="value">` + `<span class="` + ((lifetime['Current Win Streak'] === 0) ? 'lose' : 'win') + `">` + lifetime['Current Win Streak'] + `</span>` + ` / ` + lifetime['Longest Win Streak'] + `</div>
+                        <div class="value"><span class="${((lifetime['Current Win Streak'] === 0) ? 'lose' : 'win')}">${lifetime['Current Win Streak']}</span> / ${lifetime['Longest Win Streak']}</div>
                         <div class="label">STREAK</div>
                     </a>
                 </div>
             </div>
             <div class="faceit_badge">
-                <div class="profile_header_badge" style="background-image: url(` + profile.cover_image + `);">
+                <div class="profile_header_badge" style="background-image: url(${profile.cover_image});">
                     <div class="favorite_badge">
                         <style>
                         .faceit_badge .favorite_badge_icon::after {
-                            content: "` + elo + `"
+                            content: "${elo}"
                         }
                         </style>
                         <div class="favorite_badge_icon" data-tooltip-html="Level and ELO on Faceit">
-                            <a class="text-white" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">
-                                <img src="` + chrome.extension.getURL('images/lvl_' + skill_level + '.svg') + `" class="badge_icon small"> </a> </div>
+                            <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">
+                                <img src="${chrome.extension.getURL(`images/lvl_${skill_level}.svg`)}" class="badge_icon small"> </a> </div>
                                 <div class="favorite_badge_description">
                                     <div class="name ellipsis">
-                                        <a class="text-white" target="_blank" href="https://faceit.com/en/players/` + profile.nickname + `">` + profile.nickname + `</a>
+                                        <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">${profile.nickname}</a>
                                     </div>
-                                    Membership: ` + profile.membership_type + `<br>Last 20 games:
-                                <div class="favorite_bi_win">` + win + `</div>:<div class="favorite_bi_lose">` + lose + `</div>
+                                    Membership: ${profile.membership_type}<br>Last 20 games:
+                                <div class="favorite_bi_win">${win}</div>:<div class="favorite_bi_lose">${lose}</div>
                         </div>
                     </div>
                 </div>
@@ -169,35 +169,35 @@ function statsLayout() {
 }
 // Players layout
 function playersLayout(match_id, team, player) {
-    return $('.' + match_id + '_team_' + team).after(`
-        <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_row faceit_stats_details">
+    return $(`.${match_id}_team_${team}`).after(`
+        <tr data-id="${match_id}" class="nonresponsive_hidden faceit_row faceit_stats_details">
             <td colspan=3 class="links">
-                <a class="text-primary" data-player_id="` + player.player_id + `"><span>[Steam]</span></a>
-                <a href="https://www.faceit.com/en/players/` + player.nickname + `" target="_blank" class="text-faceit"><span>` + player.nickname + `</span></a>
+                <a class="text-primary" data-player_id="${player.player_id}"><span>[Steam]</span></a>
+                <a href="https://www.faceit.com/en/players/${player.nickname}" target="_blank" class="text-faceit"><span>${player.nickname}</span></a>
             </td>
             <td>
-                <span>` + player.player_stats['Kills'] + `-` + player.player_stats['Assists'] + `-` + player.player_stats['Deaths'] + `</span>
+                <span>${player.player_stats['Kills']}-${player.player_stats['Assists']}-${player.player_stats['Deaths']}</span>
             </td>
             <td>
-                <span class="stat_` + ((player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/D Ratio'] + `</span>
+                <span class="stat_${((player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase')}">${player.player_stats['K/D Ratio']}</span>
             </td>
             <td>
-                <span class="stat_` + ((player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase') + `">` + player.player_stats['K/R Ratio'] + `</span>
+                <span class="stat_${((player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase')}">${player.player_stats['K/R Ratio']}</span>
             </td>
             <td>
-                <span>` + player.player_stats['Headshots %'] + `% (` + player.player_stats['Headshot'] + `)</span>
+                <span>${player.player_stats['Headshots %']}% (${player.player_stats['Headshots']})</span>
             </td>
             <td>
-                <span class="` + ((player.player_stats['MVPs'] > 0) ? 'text-white' : '') + `">` + player.player_stats['MVPs'] + `</span>
+                <span class="${((player.player_stats['MVPs'] > 0) ? 'text-white' : '')}">${player.player_stats['MVPs']}</span>
             </td>
             <td>
-                <span class="` + ((player.player_stats['Triple Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Triple Kills'] + `</span>
+                <span class="${((player.player_stats['Triple Kills'] > 0) ? 'text-white' : '')}">${player.player_stats['Triple Kills']}</span>
             </td>
             <td>
-                <span class="` + ((player.player_stats['Quadro Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Quadro Kills'] + `</span>
+                <span class="${((player.player_stats['Quadro Kills'] > 0) ? 'text-white' : '')}">${player.player_stats['Quadro Kills']}</span>
             </td>
             <td>
-                <span class="` + ((player.player_stats['Penta Kills'] > 0) ? 'text-white' : '') + `">` + player.player_stats['Penta Kills'] + `</span>
+                <span class="${((player.player_stats['Penta Kills'] > 0) ? 'text-white' : '')}">${player.player_stats['Penta Kills']}</span>
             </td>
         </tr>`);
 }
@@ -206,7 +206,7 @@ function mapsLayout(map) {
     return $('<div>', {
             class: "game_info_achievement plus_more",
             'data-tooltip-html': map.label,
-            style: "background-image: url(" + map.img_small + ");"
+            style: `background-image: url(${map.img_small})`
         })
         .append($('<span>', {
                 class: "kd",
@@ -218,7 +218,7 @@ function mapsLayout(map) {
             })))
         .append($('<span>', {
             class: "winrate",
-            text: map.stats['Win Rate %'] + "%"
+            text: `${map.stats['Win Rate %']}%`
         }))
         .append($('<span>', {
                 class: "wr",
@@ -245,7 +245,7 @@ function getLastGames() {
 
         // Get match detailed data to create a table
         $.getJSON({
-            url: API_URL + '/matches/' + game.match_id + '/stats',
+            url: `${API_URL}/matches/${game.match_id}/stats`,
             success: data => {
                 $.each(data.rounds, stats => {
 
@@ -279,13 +279,13 @@ function getLastGames() {
                                     match_list[counter].team_id = team.team_id;
                                     match_list[counter].score = score;
                                     match_list[counter].map = map;
-                                    match_list[counter].faceit_url = 'https://www.faceit.com/en/csgo/room/' + game.match_id;
+                                    match_list[counter].faceit_url = `https://www.faceit.com/en/csgo/room/${game.match_id}`;
                                     match_list[counter].assists = player_stats['Assists'];
                                     match_list[counter].deaths = player_stats['Deaths'];
                                     match_list[counter].kills = player_stats['Kills'];
                                     match_list[counter].kda = player_stats['K/D Ratio'];
                                     match_list[counter].kr = player_stats['K/R Ratio'];
-                                    match_list[counter].hs = player_stats['Headshot'];
+                                    match_list[counter].hs = player_stats['Headshots'];
                                     match_list[counter].hs_percent = player_stats['Headshots %'];
                                     match_list[counter].mvps = player_stats['MVPs'];
                                     match_list[counter].tripple = player_stats['Triple Kills'];
@@ -302,11 +302,11 @@ function getLastGames() {
             complete: () => {
                 $('.faceit_stats_content').attr('style', 'margin-top: 32px !important');
                 $('.faceit_stats').show();
-                $('.faceit_stats_load').text('LOADING... [' + cnt + ']');
+                $('.faceit_stats_load').text(`LOADING... [${cnt}]`);
 
                 if (cnt === (games_list.length - 1)) {
 
-                    $('.faceit_stats_load').text('LAST ' + (games_list.length) + ' GAMES');
+                    $('.faceit_stats_load').text(`LAST ${(games_list.length)} GAMES`);
 
                     $.each(match_list, match_id => {
 
@@ -317,7 +317,7 @@ function getLastGames() {
 
                         if (match_list[match_id].leaver) {
                             $('.faceit_stats_tbody').append(
-                                `<tr data-match-id="` + match_id + `" class="faceit_row faceit_stats_leaver">
+                                `<tr data-match-id="${match_id}" class="faceit_row faceit_stats_leaver">
                                     <td style="text-align:center;font-weight:bold;padding-left:0;">
                                         A
                                     </td>
@@ -325,7 +325,7 @@ function getLastGames() {
                                         ABANDONED
                                     </td>
                                     <td>
-                                        <a href="https://faceit.com/en/csgo/room/` + match_list[match_id].match.id + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
+                                        <a href="https://faceit.com/en/csgo/room/${match_list[match_id].match.id}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
                                             <div class="btn_black btn_details btn_small">
                                                 <span>🔗</span>
                                             </div>
@@ -334,54 +334,54 @@ function getLastGames() {
                                 </tr>`);
                         } else {
                             $('.faceit_stats_tbody').append(`
-                                <tr data-match-id="` + match_id + `" class="faceit_row faceit_stats_` + ((is_winner === 1) ? `win` : `lose`) + `">
+                                <tr data-match-id="${match_id}" class="faceit_row faceit_stats_${((is_winner === 1) ? `win` : `lose`)}">
                                     <td style="text-align:center;font-weight:bold;padding-left:0;">
-                                        ` + ((is_winner === 1) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`) + `
+                                        ${((is_winner === 1) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`)}
                                     </td>
                                     <td>
-                                        <span>` + match_list[match_id].team_name + `</span>
+                                        <span>${match_list[match_id].team_name}</span>
                                     </td>
                                     <td>
-                                        <span>` + match_list[match_id].score + `</span>
+                                        <span>${match_list[match_id].score}</span>
                                     </td>
                                     <td>
-                                        <span>` + match_list[match_id].kills + `-` + match_list[match_id].assists + `-` + match_list[match_id].deaths + `</span>
-                                    </td>
-
-                                    <td>
-                                        <span class="stat_` + ((match_list[match_id].kda < 1) ? 'decrease' : 'increase') + `">` + match_list[match_id].kda + `</span>
-                                    </td>
-                                    <td>
-                                        <span class="stat_` + ((match_list[match_id].kr < 1) ? 'decrease' : 'increase') + `">` + match_list[match_id].kr + `</span>
+                                        <span>${match_list[match_id].kills}-${match_list[match_id].assists}-${match_list[match_id].deaths}</span>
                                     </td>
 
                                     <td>
-                                        <span>` + match_list[match_id].hs_percent + `% (` + match_list[match_id].hs + `)</span>
+                                        <span class="stat_${((match_list[match_id].kda < 1) ? 'decrease' : 'increase')}">${match_list[match_id].kda}</span>
+                                    </td>
+                                    <td>
+                                        <span class="stat_${((match_list[match_id].kr < 1) ? 'decrease' : 'increase')}">${match_list[match_id].kr}</span>
+                                    </td>
+
+                                    <td>
+                                        <span>${match_list[match_id].hs_percent}% (${match_list[match_id].hs})</span>
                                     </td>
 
 
                                     <td>
-                                        <span>` + match_list[match_id].map + `</span>
+                                        <span>${match_list[match_id].map}</span>
                                     </td>
                                     <td>
-                                        <span>` + match_list[match_id].finished_at + `</span>
+                                        <span>${match_list[match_id].finished_at}</span>
                                     </td>
                                     <td>
-                                        <span>` +
-                                ((match_list[match_id].elo === undefined) ?
-                                    `---` :
-                                    match_list[match_id].elo + ` <span class="stat_` +
-                                    (
-                                        (is_winner === 1) ?
-                                        `increase">` :
-                                        `decrease">`
-                                    ) +
-                                    (((match_id === (games_list.length - 1)) ? `` : (match_list[match_id + 1].elo === undefined) ?
-                                        `` : `(` +
-                                        (((match_list[match_id].elo - match_list[match_id + 1].elo) < 0) ?
-                                            match_list[match_id].elo - match_list[match_id + 1].elo :
-                                            `+` + (match_list[match_id].elo - match_list[match_id + 1].elo)) + `)</span>`))) +
-                                `</span>
+                                        <span>
+                                            ${((match_list[match_id].elo === undefined) ?
+                                                `---` :
+                                                match_list[match_id].elo + ` <span class="stat_` +
+                                                (
+                                                    (is_winner === 1) ?
+                                                    `increase">` :
+                                                    `decrease">`
+                                                ) +
+                                                (((match_id === (games_list.length - 1)) ? `` : (match_list[match_id + 1].elo === undefined) ?
+                                                    `` : `(` +
+                                                    (((match_list[match_id].elo - match_list[match_id + 1].elo) < 0) ?
+                                                        match_list[match_id].elo - match_list[match_id + 1].elo :
+                                                        `+` + (match_list[match_id].elo - match_list[match_id + 1].elo)) + `)</span>`)))}
+                                        </span>
                                     </td>
                                     <td>
                                         <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
@@ -393,42 +393,41 @@ function getLastGames() {
                                         </div>
                                     </td>
                                 </tr>
-                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header">
+                                <tr data-id="${match_id}" class="nonresponsive_hidden faceit_stats_details_header">
                                     <th colspan=7>
-                                        <span class="stat_` + ((winner_id === 'faction1') ? `increase` : `decrease`) + `">` + team_A.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
+                                        <span class="stat_${((winner_id === 'faction1') ? `increase` : `decrease`)}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
                                     </th>
                                     <th colspan=3>
                                         <span>
-                                            FINAL SCORE: <span class="text-white">` + team_A.team_stats['Final Score'] + ` <span data-tooltip-html="FIRST HALF">(` + team_A.team_stats['First Half Score'] + `</span>:<span data-tooltip-html="SECOND HALF">` + team_A.team_stats['Second Half Score'] + `</span> | <span data-tooltip-html="OVERTIME">` + team_A.team_stats['Overtime score'] + `</span>)
+                                            FINAL SCORE: <span class="text-white">${team_A.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_A.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_A.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_A.team_stats['Overtime score']}</span>)
                                         </span>
                                     </th>
-                                    <th>` +
-                                ((match_list[match_id].demo_url === 'empty') ?
-                                    `` :
-                                    `<a href="` + match_list[match_id].demo_url + `" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
-                                            <div class="btn_black btn_details btn_small">
-                                                <span>
-                                                    <span class="ico16 btn_active bluearrow_down"></span>
-                                                </span>
-                                            </div>
-                                        </a>`) + `
+                                    <th>
+                                    ${((match_list[match_id].demo_url === 'empty') ?
+                                        `` :
+                                        `<a href="${match_list[match_id].demo_url}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
+                                                <div class="btn_black btn_details btn_small">
+                                                    <span>
+                                                        <span class="ico16 btn_active bluearrow_down"></span>
+                                                    </span>
+                                                </div>
+                                            </a>`)}
                                     </th>
                                 </tr>
-                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header ` + match_id + `_team_A">` + additional_th + `</tr>
-                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header">
+                                <tr data-id="${match_id}" class="nonresponsive_hidden faceit_stats_details_header ${match_id}_team_A">${additional_th}</tr>
+                                <tr data-id="${match_id}" class="nonresponsive_hidden faceit_stats_details_header">
                                     <th colspan=7>
-                                        <span class="stat_` + ((winner_id === 'faction2') ? `increase` : `decrease`) + `">` + team_B.team_stats['Team'].toUpperCase() + ` SCOREBOARD</span>
+                                        <span class="stat_${((winner_id === 'faction2') ? `increase` : `decrease`)}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
                                     </th>
                                     <th colspan=3>
                                         <span>
-                                            FINAL SCORE: <span class="text-white">` + team_B.team_stats['Final Score'] + ` <span data-tooltip-html="FIRST HALF">(` + team_B.team_stats['First Half Score'] + `</span>:<span data-tooltip-html="SECOND HALF">` + team_B.team_stats['Second Half Score'] + `</span> | <span data-tooltip-html="OVERTIME">` + team_B.team_stats['Overtime score'] + `</span>)
+                                            FINAL SCORE: <span class="text-white">${team_B.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_B.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_B.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_B.team_stats['Overtime score']}</span>)
                                         </span>
                                     </th>
                                     <th>
                                     </th>
                                 </tr>
-                                <tr data-id="` + match_id + `" class="nonresponsive_hidden faceit_stats_details_header ` + match_id + `_team_B">` + additional_th + `</tr>`
-                            );
+                                <tr data-id="${match_id}" class="nonresponsive_hidden faceit_stats_details_header ${match_id}_team_B">${additional_th}</tr>`);
                             $.each(team_A.players.sort((a, b) => (parseInt(a['player_stats'].Kills) >= parseInt(b['player_stats'].Kills)) ? 1 : -1), players => {
                                 playersLayout(match_id, 'A', team_A.players[players]);
                             });
@@ -444,7 +443,7 @@ function getLastGames() {
         });
         // Get match finish time and demo link
         $.getJSON({
-            url: API_URL + '/matches/' + game.match_id,
+            url: `${API_URL}/matches/${game.match_id}`,
             success: data => {
                 match_list[counter].finished_at = new Date(data.finished_at * 1000).toLocaleString('en-GB');
             },
@@ -460,13 +459,13 @@ function getLastGames() {
 // Get player steam_id_64
 function getSteamId64(player) {
     $.getJSON({
-        url: API_URL + '/players/' + player.data('player_id'),
+        url: `${API_URL}/players/${player.data('player_id')}`,
         success: data => {
-            $(player).css('cursor','pointer');
-            window.open('https://steamcommunity.com/profiles/' + data.steam_id_64, "_blank", "noopener,noreferrer");
+            $(player).css('cursor', 'pointer');
+            window.open(`https://steamcommunity.com/profiles/${data.steam_id_64}`, "_blank", "noopener,noreferrer");
         },
         beforeSend: () => {
-            $(player).css('cursor','wait');
+            $(player).css('cursor', 'wait');
         }
     });
 }
@@ -477,7 +476,7 @@ if (!$(".faceit_maps")[0]) {
     let steam_id = $.parseJSON('{"' + $('.responsive_page_template_content script').html().split('{"').pop().split('"}')[0] + '"}').steamid;
 
     $.getJSON({
-        url: API_URL + '/search/players?nickname=' + steam_id + '&offset=0&limit=1',
+        url: `${API_URL}/search/players?nickname=${steam_id}&offset=0&limit=1`,
         success: data => {
 
             // If faceit profile not found return error
@@ -496,7 +495,7 @@ if (!$(".faceit_maps")[0]) {
             // Check profile bans
             if (banned === 'banned') {
                 $.getJSON({
-                    url: "https://api.faceit.com/sheriff/v1/bans/" + faceit_playerID,
+                    url: `https://api.faceit.com/sheriff/v1/bans/${faceit_playerID}`,
                     headers: {
                         'Authorization': null
                     },
@@ -508,7 +507,7 @@ if (!$(".faceit_maps")[0]) {
 
             // Get last 20 games
             $.getJSON({
-                url: API_URL + '/players/' + faceit_playerID + '/history?from=0&game=csgo&limit=20',
+                url: `${API_URL}/players/${faceit_playerID}/history?from=0&game=csgo&limit=20`,
                 success: data => {
 
                     games_list = data.items;
@@ -551,7 +550,7 @@ if (!$(".faceit_maps")[0]) {
                         }
                         // Get and calculate last 20 games stats
                         $.getJSON({
-                            url: 'https://api.faceit.com/stats/v1/stats/time/users/' + faceit_playerID + '/games/csgo?size=' + size,
+                            url: `https://api.faceit.com/stats/v1/stats/time/users/${faceit_playerID}/games/csgo?size=${size}`,
                             headers: {
                                 'Authorization': null
                             },
@@ -585,7 +584,7 @@ if (!$(".faceit_maps")[0]) {
 
                         // Get lifetime stats
                         $.getJSON({
-                            url: API_URL + '/players/' + faceit_playerID,
+                            url: `${API_URL}/players/${faceit_playerID}`,
                             success: data => {
                                 // If csgo profile exists
                                 if (data.games['csgo']) {
@@ -594,7 +593,7 @@ if (!$(".faceit_maps")[0]) {
                                         skill_level = profile_data.games['csgo'].skill_level;
                                     // Get csgo stats
                                     $.getJSON({
-                                        url: API_URL + '/players/' + faceit_playerID + '/stats/csgo',
+                                        url: `${API_URL}/players/${faceit_playerID}/stats/csgo`,
                                         success: data => {
 
                                             let lifetime = data.lifetime,
@@ -630,7 +629,7 @@ if (!$(".faceit_maps")[0]) {
                                             }
                                             // Ban bar
                                             if (banned != '' && banned != 'AVAILABLE' && banned != 'active' && banned != 'BUSY') {
-                                                $('.faceit_content').css('padding-top', '28px').prepend('<div class="banned" data-tooltip-html="Ban reason">' + banned + '</div>')
+                                                $('.faceit_content').css('padding-top', '28px').prepend(`<div class="banned" data-tooltip-html="Ban reason">${banned}</div>`)
                                             }
                                         },
                                         error: data => {
@@ -673,7 +672,7 @@ $(document).on('click', '.faceit_stats_load', () => {
 // Open match details
 $(document).on('click', '.filter_tag_button_ctn', function() {
     $(this).find('.btn_details_arrow').toggleClass('down').toggleClass('up');
-    $('tr[data-id=' + $(this).parents('.faceit_row').data('match-id') + ']').toggle();
+    $(`tr[data-id=${$(this).parents('.faceit_row').data('match-id')}]`).toggle();
 });
 // Open player steam profile
 $(document).on('click', '.text-primary', function() {
