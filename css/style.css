@@ -290,6 +290,10 @@
     color: #ff5722 !important;
 }
 
+.text-underline {
+    text-decoration: underline;
+}
+
 .links {
     color: transparent !important;
 }
