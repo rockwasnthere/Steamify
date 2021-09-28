@@ -54,7 +54,8 @@ const
         'de_mirage',
         'de_inferno',
         'de_vertigo',
-        'de_overpass'
+        'de_overpass',
+        'de_ancient'
     ],
 
     additional_th = '<th colspan=7>PLAYER</th><th>MVPs</th><th>TRIPLE</th><th>QUADRO</th><th>PENTA</th>';
