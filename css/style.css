@@ -150,9 +150,8 @@
 
 .faceit_badge .favorite_badge_icon::after {
     content: "0000";
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 8px;
+    left: 18px;
     font-weight: bold;
     color: #fff;
     position: absolute;
