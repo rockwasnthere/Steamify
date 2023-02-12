@@ -223,8 +223,11 @@
     background-color: #ff9800;
 }
 
-.favorite_badge_description {
-    padding-top: 4px !important;
+.faceit_badge .favorite_badge_description {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 59px;
 }
 
 .favorite_bi_win {

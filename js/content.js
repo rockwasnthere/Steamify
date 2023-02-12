@@ -7,7 +7,7 @@ const
     API_URL = 'https://open.faceit.com/data/v4',
 
     // sotsad emoticon :P
-    E_SOTSAD = `<img alt=":sotsad:" src="${chrome.extension.getURL('images/icon/sotsad.png')}">`,
+    E_SOTSAD = `<img alt=":sotsad:" src="${chrome.runtime.getURL('images/icon/sotsad.png')}">`,
 
     // No faceit profile
     L_NOT_FOUND =
@@ -46,19 +46,24 @@ const
         text: "No CSGO stats on Faceit"
     }).append(E_SOTSAD),
 
-    // Current maps pool
+    // Current map pool
     MAPS_VETO = [
+        // 'de_train',
+        // 'de_dust2',
         'de_nuke',
-        'de_train',
-        'de_dust2',
         'de_mirage',
         'de_inferno',
         'de_vertigo',
         'de_overpass',
-        'de_ancient'
+        'de_ancient',
+        'de_anubis'
     ],
 
-    additional_th = '<th colspan=7>PLAYER</th><th>MVPs</th><th>TRIPLE</th><th>QUADRO</th><th>PENTA</th>';
+    additional_th = '<th colspan=7>PLAYER</th><th>MVPs</th><th>TRIPLE</th><th>QUADRO</th><th>PENTA</th>',
+
+    verified_svg = `<svg height="16" width="16" viewBox="0 0 24 24" data-tooltip-html="FACEIT confirmed this is the authentic profile for this player">
+                        <path fill-rule="evenodd" clip-rule="evenodd" fill="#ff5500" d="M12.531 2.034a.667.667 0 0 0-1.062 0L9.379 4.79a.667.667 0 0 1-.623.258L5.33 4.577a.667.667 0 0 0-.752.752l.472 3.427a.667.667 0 0 1-.258.622l-2.757 2.09a.667.667 0 0 0 0 1.063l2.757 2.09a.67.67 0 0 1 .258.623l-.472 3.427a.667.667 0 0 0 .752.752l3.427-.472a.667.667 0 0 1 .622.258l2.09 2.757a.667.667 0 0 0 1.063 0l2.09-2.757a.667.667 0 0 1 .623-.258l3.427.472a.667.667 0 0 0 .752-.752l-.472-3.427a.667.667 0 0 1 .258-.622l2.757-2.09a.667.667 0 0 0 0-1.063l-2.757-2.09a.667.667 0 0 1-.258-.623l.472-3.427a.667.667 0 0 0-.752-.752l-3.427.472a.667.667 0 0 1-.622-.258l-2.09-2.757zM6.667 11.2l4.571 4.8 6.095-8-6.095 4.8-4.571-1.6z"></path>
+                    </svg>`;
 
 let size = 21,
     matches_list,
@@ -72,10 +77,26 @@ $.ajaxSetup({
         'Authorization': BEARER,
     }
 });
+// Add team
+const addTeam = (array, match_id, side) => {
+    $.each(array.players.sort((a, b) => (parseInt(a['player_stats'].Kills) >= parseInt(b['player_stats'].Kills)) ? 1 : -1), players => {
+        playersLayout(match_id, side, array.players[players]);
+    });
+}
+// Get maps detailed stats
+const getMapsStats = (segments) => {
+    $.each(segments, map => {
+        if (segments[map].mode === '5v5' && MAPS_VETO.includes(segments[map].label)) {
+            $('.faceit_maps').append(
+                mapsLayout(segments[map])
+            );
+        }
+    });
+}
 // Calculate average
-const calcAvg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+const calcAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 // Showcase layout
-const showcaseLayout = (lifetime, profile, elo, skill_level, win, lose, last_hs, last_kd) => {
+const showcaseLayout = (lifetime, profile, elo, skill_level, win, lose, last_hs, last_kd, verified) => {
     return `
         <div class="showcase_faceit_content">
             <div class="showcase_stats">
@@ -115,13 +136,18 @@ const showcaseLayout = (lifetime, profile, elo, skill_level, win, lose, last_hs,
                         </style>
                         <div class="favorite_badge_icon" data-tooltip-html="Level and ELO on Faceit">
                             <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">
-                                <img src="${chrome.extension.getURL(`images/lvl_${skill_level}.svg`)}" class="badge_icon small"> </a> </div>
+                                <img src="${chrome.runtime.getURL(`images/lvl_${skill_level}.svg`)}" class="badge_icon small"> </a> </div>
                                 <div class="favorite_badge_description">
                                     <div class="name ellipsis">
                                         <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">${profile.nickname}</a>
+                                        ${verified ? verified_svg : ''}
                                     </div>
-                                    Membership: ${profile.memberships[0]}<br>Last 20 games:
-                                <div class="favorite_bi_win">${win}</div>:<div class="favorite_bi_lose">${lose}</div>
+                                    <div>
+                                        Membership: ${profile.memberships[0]}
+                                    </div>
+                                    <div>
+                                        Last 20 games: <div class="favorite_bi_win">${win}</div>:<div class="favorite_bi_lose">${lose}</div>
+                                    </div>
                         </div>
                     </div>
                 </div>
@@ -163,7 +189,6 @@ const statsLayout = () => {
         </table>
     </div>`;
 }
-
 // Players layout
 const playersLayout = (match_id, team, player) => {
     return $(`.${match_id}_team_${team}`).after(`
@@ -441,12 +466,9 @@ const getLastGames = () => {
                                     </th>
                                 </tr>
                                 <tr data-id="${match_id}" class="nonresponsive_hidden faceit_stats_details_header ${match_id}_team_B">${additional_th}</tr>`);
-                            $.each(team_A.players.sort((a, b) => (parseInt(a['player_stats'].Kills) >= parseInt(b['player_stats'].Kills)) ? 1 : -1), players => {
-                                playersLayout(match_id, 'A', team_A.players[players]);
-                            });
-                            $.each(team_B.players.sort((a, b) => (parseInt(a['player_stats'].Kills) >= parseInt(b['player_stats'].Kills)) ? 1 : -1), players => {
-                                playersLayout(match_id, 'B', team_B.players[players]);
-                            });
+
+                            addTeam(team_A, match_id, 'A');
+                            addTeam(team_B, match_id, 'B');
                         }
                     });
                 } else {
@@ -482,15 +504,20 @@ const getSteamId64 = (player) => {
         }
     });
 }
+// parse steamid
+const parseSteamId = () => {
+    return $.parseJSON(`{"${$('.responsive_page_template_content script').html().split('{"').pop().split('"}')[0]}"}`).steamid;
+}
 
 if (!$(".faceit_maps")[0]) {
 
     // Get steamid
-    let steam_id = $.parseJSON(`{"${$('.responsive_page_template_content script').html().split('{"').pop().split('"}')[0]}"}`).steamid;
+    let steam_id = parseSteamId();
 
     $.getJSON({
         url: `${API_URL}/search/players?nickname=${steam_id}&offset=0&limit=1`,
         success: data => {
+            let verified = data.items[0].verified;
 
             // If faceit profile not found return error
             if (data.items.length === 0) {
@@ -574,17 +601,13 @@ if (!$(".faceit_maps")[0]) {
                                                     win,
                                                     lose,
                                                     last_hs,
-                                                    last_kd
+                                                    last_kd,
+                                                    verified
                                                 )
                                             );
-                                            // Get maps detailed stats
-                                            $.each(segments, map => {
-                                                if (segments[map].mode === '5v5' && MAPS_VETO.includes(segments[map].label)) {
-                                                    $('.faceit_maps').append(
-                                                        mapsLayout(segments[map])
-                                                    );
-                                                }
-                                            });
+                                            
+                                            getMapsStats(segments);
+
                                             // Check if maps played length equals to MapsVeto length to center them
                                             if ($('.faceit_maps > *').length < MAPS_VETO.length) {
                                                 $('.faceit_maps').css('justify-content', 'center');
