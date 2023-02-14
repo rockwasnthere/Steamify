@@ -1,6 +1,6 @@
 .faceit_content {
     position: relative;
-    display: flex;
+    /* display: none; */
     justify-content: space-between;
     flex-wrap: wrap;
     align-items: center;
@@ -63,6 +63,9 @@
     height: 14px;
     width: 100%;
     background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .wr>.lose,
