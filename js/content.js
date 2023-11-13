@@ -10,33 +10,33 @@ const
 
     // No faceit profile
     ELEMENT_FACEIT_NOT_FOUND =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "Faceit account wasn`t found"
-        }).append(EMOTE_SOTSAD),
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "Faceit account wasn`t found"
+    }).append(EMOTE_SOTSAD),
 
     // No available matches
     ELEMENT_MATCHES_NOT_FOUND =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "No matches found"
-        }).append(EMOTE_SOTSAD),
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "No matches found"
+    }).append(EMOTE_SOTSAD),
 
     // Preloader bar
     ELEMENT_LOADING =
-        $('<div>', {
-            class: "LoadingWrapper wrapper-orange"
-        }).append($('<div>', { class: "LoadingThrobber" })
-            .append($('<div>', { class: "Bar Bar1" }))
-            .append($('<div>', { class: "Bar Bar2" }))
-            .append($('<div>', { class: "Bar Bar3" }))),
+    $('<div>', {
+        class: "LoadingWrapper wrapper-orange"
+    }).append($('<div>', { class: "LoadingThrobber" })
+        .append($('<div>', { class: "Bar Bar1" }))
+        .append($('<div>', { class: "Bar Bar2" }))
+        .append($('<div>', { class: "Bar Bar3" }))),
 
-    // No csgo profile on faceit
-    ELEMENT_NO_CSGO =
-        $('<div>', {
-            class: "showcase_content_bg showcase_stats_row not_found",
-            text: "No CSGO stats on Faceit"
-        }).append(EMOTE_SOTSAD),
+    // No cs2 profile on faceit
+    ELEMENT_NO_CS2 =
+    $('<div>', {
+        class: "showcase_content_bg showcase_stats_row not_found",
+        text: "No CS2 stats on Faceit"
+    }).append(EMOTE_SOTSAD),
 
     // An error happend
     // RESPONSE_ERROR =
@@ -241,14 +241,14 @@ const playersLayout = (matchID, team, player) => {
 // Maps layout
 const mapsLayout = (map) => {
     return $('<div>', {
-        class: "game_info_achievement plus_more",
-        'data-tooltip-html': map.label,
-        style: `background-image: url(${map.img_small})`
-    })
-        .append($('<span>', {
-            class: "kd",
-            text: "K/D:"
+            class: "game_info_achievement plus_more",
+            'data-tooltip-html': map.label,
+            style: `background-image: url(${map.img_small})`
         })
+        .append($('<span>', {
+                class: "kd",
+                text: "K/D:"
+            })
             .append($('<span>', {
                 class: (map.stats['Average K/D Ratio'] >= 1) ? 'win' : 'lose',
                 text: map.stats['Average K/D Ratio']
@@ -258,8 +258,8 @@ const mapsLayout = (map) => {
             text: `${map.stats['Win Rate %']}%`
         }))
         .append($('<span>', {
-            class: "wr",
-        })
+                class: "wr",
+            })
             .append($('<span>', {
                 class: "win",
                 text: map.stats['Wins']
@@ -316,7 +316,7 @@ const getLastGames = () => {
                                 matchList[matchesCounter].team_id = team_id;
                                 matchList[matchesCounter].score = score;
                                 matchList[matchesCounter].map = map;
-                                matchList[matchesCounter].faceit_url = `https://www.faceit.com/en/csgo/room/${game.match_id}`;
+                                matchList[matchesCounter].faceit_url = `https://www.faceit.com/en/cs2/room/${game.match_id}`;
                                 matchList[matchesCounter].assists = player_stats['Assists'];
                                 matchList[matchesCounter].deaths = player_stats['Deaths'];
                                 matchList[matchesCounter].kills = player_stats['Kills'];
@@ -349,139 +349,141 @@ const getLastGames = () => {
                     ];
 
                     $.each(matchList, matchID => {
+                        let match = matchList[matchID];
 
-                        if (matchID !== 20) {
-                            const match = matchList[matchID];
-                            const [team_A, team_B] = match.match.teams[0];
-                            const { winner: is_winner, winner_id } = match.match;
+                        if (matchID === 20 || matchList[matchID].match.teams[0] === undefined) return;
 
-                            if (!match.leaver) {
-                                KD.push(parseFloat(match.kda));
-                                HS.push(parseFloat(match.hs_percent));
-                            }
+                        let team_A = match.match.teams[0][0],
+                            team_B = match.match.teams[0][1],
+                            is_winner = match.match.winner,
+                            winner_id = match.match.winner_id;
 
-                            $('.lastHS').text(calcAvg(HS).toFixed(0));
-                            $('.lastKD').text(calcAvg(KD).toFixed(2));
+                        if (!match.leaver) {
+                            KD.push(parseFloat(match.kda));
+                            HS.push(parseFloat(match.hs_percent));
+                        }
 
-                            if (match.leaver) {
-                                $('.faceit_stats_tbody').append(
-                                    `<tr data-match-id="${matchID}" class="faceit_row faceit_stats_leaver">
-                                    <td style="text-align:center;font-weight:bold;padding-left:0;">
-                                        A
-                                    </td>
-                                    <td colspan=9 style="text-align:center;font-weight:bold;padding-left:0;">
-                                        ABANDONED
-                                    </td>
-                                    <td>
-                                        <a href="https://faceit.com/en/csgo/room/${match.match.id}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
-                                            <div class="btn_black btn_details btn_small">
-                                                <span>🔗</span>
-                                            </div>
-                                        </a>
-                                    </td>
-                                </tr>`);
-                            } else {
-                                $('.faceit_stats_tbody').append(`
-                                <tr data-match-id="${matchID}" class="faceit_row faceit_stats_${(is_winner) ? `win` : `lose`}">
-                                    <td style="text-align:center;font-weight:bold;padding-left:0;">
-                                        ${(is_winner) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`}
-                                    </td>
-                                    <td>
-                                        <span><a href="${match.faceit_url}" target="_blank" class="text-underline">${match.team_name}</a></span>
-                                    </td>
-                                    <td>
-                                        <span>${match.score}</span>
-                                    </td>
-                                    <td>
-                                        <span>${match.kills}-${match.assists}-${match.deaths}</span>
-                                    </td>
+                        $('.lastHS').text(calcAvg(HS).toFixed(0));
+                        $('.lastKD').text(calcAvg(KD).toFixed(2));
 
-                                    <td>
-                                        <span class="stat_${(match.kda < 1) ? 'decrease' : 'increase'}">${match.kda}</span>
-                                    </td>
-                                    <td>
-                                        <span class="stat_${(match.kr < 1) ? 'decrease' : 'increase'}">${match.kr}</span>
-                                    </td>
-
-                                    <td>
-                                        <span>${match.hs_percent}% (${match.hs})</span>
-                                    </td>
-
-
-                                    <td>
-                                        <span>${match.map}</span>
-                                    </td>
-                                    <td colspan=2>
-                                        <span>${match.finished_at}</span>
-                                    </td>
-                                    <!--
-                                    <td>
-                                        <span>
-                                            ${(match.elo === undefined) ?
-                                        `---` :
-                                        match.elo + ` <span class="stat_` +
-                                        (
-                                            (is_winner) ?
-                                                `increase">` :
-                                                `decrease">`
-                                        ) +
-                                        ((matchID === (matchesList.length - 1)) ? `` : (matchList[matchID + 1].elo === undefined) ?
-                                            `` : `(` +
-                                            (((match.elo - matchList[matchID + 1].elo) < 0) ?
-                                                match.elo - matchList[matchID + 1].elo :
-                                                `+` + (match.elo - matchList[matchID + 1].elo)) + `)</span>`)}
-                                        </span>
-                                    </td>
-                                    -->
-                                    <td class="faceit_arrow">
-                                        <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
-                                            <div class="btn_black btn_details btn_small">
-                                                <span>
-                                                    <span class="btn_details_arrow down"></span>
-                                                </span>
-                                            </div>
+                        if (match.leaver) {
+                            $('.faceit_stats_tbody').append(
+                                `<tr data-match-id="${matchID}" class="faceit_row faceit_stats_leaver">
+                                <td style="text-align:center;font-weight:bold;padding-left:0;">
+                                    A
+                                </td>
+                                <td colspan=9 style="text-align:center;font-weight:bold;padding-left:0;">
+                                    ABANDONED
+                                </td>
+                                <td>
+                                    <a href="https://faceit.com/en/cs2/room/${match.match.id}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
+                                        <div class="btn_black btn_details btn_small">
+                                            <span>🔗</span>
                                         </div>
-                                    </td>
-                                </tr>
-                                <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
-                                    <th colspan=7>
-                                        <span class="stat_${(winner_id === 'faction1') ? `increase` : `decrease`}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
-                                    </th>
-                                    <th colspan=3>
-                                        <span>
-                                            FINAL SCORE: <span class="text-white">${team_A.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_A.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_A.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_A.team_stats['Overtime score']}</span>)
-                                        </span>
-                                    </th>
-                                    <th class="faceit_arrow">
-                                    ${(match.demo_url === 'empty') ?
-                                        `` :
-                                        `<a href="${match.demo_url}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
+                                    </a>
+                                </td>
+                            </tr>`);
+                        } else {
+                            $('.faceit_stats_tbody').append(`
+                            <tr data-match-id="${matchID}" class="faceit_row faceit_stats_${(is_winner) ? `win` : `lose`}">
+                                <td style="text-align:center;font-weight:bold;padding-left:0;">
+                                    ${(is_winner) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`}
+                                </td>
+                                <td>
+                                    <span><a href="${match.faceit_url}" target="_blank" class="text-underline">${match.team_name}</a></span>
+                                </td>
+                                <td>
+                                    <span>${match.score}</span>
+                                </td>
+                                <td>
+                                    <span>${match.kills}-${match.assists}-${match.deaths}</span>
+                                </td>
+
+                                <td>
+                                    <span class="stat_${(match.kda < 1) ? 'decrease' : 'increase'}">${match.kda}</span>
+                                </td>
+                                <td>
+                                    <span class="stat_${(match.kr < 1) ? 'decrease' : 'increase'}">${match.kr}</span>
+                                </td>
+
+                                <td>
+                                    <span>${match.hs_percent}% (${match.hs})</span>
+                                </td>
+
+
+                                <td>
+                                    <span>${match.map}</span>
+                                </td>
+                                <td colspan=2>
+                                    <span>${match.finished_at}</span>
+                                </td>
+                                <!--
+                                <td>
+                                    <span>
+                                        ${(match.elo === undefined) ?
+                                    `---` :
+                                    match.elo + ` <span class="stat_` +
+                                    (
+                                        (is_winner) ?
+                                            `increase">` :
+                                            `decrease">`
+                                    ) +
+                                    ((matchID === (matchesList.length - 1)) ? `` : (matchList[matchID + 1].elo === undefined) ?
+                                        `` : `(` +
+                                        (((match.elo - matchList[matchID + 1].elo) < 0) ?
+                                            match.elo - matchList[matchID + 1].elo :
+                                            `+` + (match.elo - matchList[matchID + 1].elo)) + `)</span>`)}
+                                    </span>
+                                </td>
+                                -->
+                                <td class="faceit_arrow">
+                                    <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
                                         <div class="btn_black btn_details btn_small">
                                             <span>
-                                                <span class="ico16 btn_active bluearrow_down"></span>
+                                                <span class="btn_details_arrow down"></span>
                                             </span>
                                         </div>
-                                    </a>`}
-                                    </th>
-                                </tr>
-                                <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_A">${ELEMENT_STATS_HEADER}</tr>
-                                <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
-                                    <th colspan=7>
-                                        <span class="stat_${(winner_id === 'faction2') ? `increase` : `decrease`}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
-                                    </th>
-                                    <th colspan=3>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
+                                <th colspan=7>
+                                    <span class="stat_${(winner_id === 'faction1') ? `increase` : `decrease`}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
+                                </th>
+                                <th colspan=3>
+                                    <span>
+                                        FINAL SCORE: <span class="text-white">${team_A.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_A.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_A.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_A.team_stats['Overtime score']}</span>)
+                                    </span>
+                                </th>
+                                <th class="faceit_arrow">
+                                ${(match.demo_url === 'empty') ?
+                                    `` :
+                                    `<a href="${match.demo_url}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
+                                    <div class="btn_black btn_details btn_small">
                                         <span>
-                                            FINAL SCORE: <span class="text-white">${team_B.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_B.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_B.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_B.team_stats['Overtime score']}</span>)
+                                            <span class="ico16 btn_active bluearrow_down"></span>
                                         </span>
-                                    </th>
-                                    <th>
-                                    </th>
-                                </tr>
-                                <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_B">${ELEMENT_STATS_HEADER}</tr>`);
+                                    </div>
+                                </a>`}
+                                </th>
+                            </tr>
+                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_A">${ELEMENT_STATS_HEADER}</tr>
+                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
+                                <th colspan=7>
+                                    <span class="stat_${(winner_id === 'faction2') ? `increase` : `decrease`}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
+                                </th>
+                                <th colspan=3>
+                                    <span>
+                                        FINAL SCORE: <span class="text-white">${team_B.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_B.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_B.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_B.team_stats['Overtime score']}</span>)
+                                    </span>
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_B">${ELEMENT_STATS_HEADER}</tr>`);
 
-                                addTeam(team_A, matchID, 'A');
-                                addTeam(team_B, matchID, 'B');
-                            }
+                            addTeam(team_A, matchID, 'A');
+                            addTeam(team_B, matchID, 'B');
                         }
                     });
                 } else {
@@ -546,7 +548,7 @@ if (!$(".faceit_maps")[0]) {
 
             // Get last 20 games
             $.getJSON({
-                url: `${API_URL}/players/${faceitPlayerID}/history?from=0&game=csgo&limit=${matchesLimit}`,
+                url: `${API_URL}/players/${faceitPlayerID}/history?from=0&game=cs2&limit=${matchesLimit}`,
                 success: data => {
 
                     matchesList = data.items;
@@ -556,7 +558,7 @@ if (!$(".faceit_maps")[0]) {
                         $('.private_profile .profile_content').css('padding-bottom', 8);
                         $('.profile_content').css('min-height', 'auto').prepend('<div class="showcase_content_bg showcase_stats_row faceit_content" style="display:none"></div>');
                         $('.faceit_content').append(statsLayout());
-                        
+
                         $.each(matchesList, matchID => {
                             var match = matchesList[matchID];
 
@@ -596,21 +598,22 @@ if (!$(".faceit_maps")[0]) {
                         $.getJSON({
                             url: `${API_URL}/players/${faceitPlayerID}`,
                             success: data => {
-                                // If csgo profile exists
-                                if (data.games['csgo']) {
+                                // If cs2 profile exists
+                                if (data.games['cs2']) {
                                     const profileData = data;
 
                                     const {
                                         games: {
-                                            csgo: {
-                                                faceit_elo: profileElo, skill_level: profileLevel
+                                            cs2: {
+                                                faceit_elo: profileElo,
+                                                skill_level: profileLevel
                                             }
                                         }
                                     } = profileData;
 
-                                    // Get csgo stats
+                                    // Get cs2 stats
                                     $.getJSON({
-                                        url: `${API_URL}/players/${faceitPlayerID}/stats/csgo`,
+                                        url: `${API_URL}/players/${faceitPlayerID}/stats/cs2`,
                                         success: data => {
                                             let { lifetime, segments } = data;
 
@@ -648,14 +651,14 @@ if (!$(".faceit_maps")[0]) {
                                         error: data => {
                                             if (data.status === 404) {
                                                 $('.LoadingWrapper').hide();
-                                                $('.profile_content').prepend(ELEMENT_NO_CSGO);
+                                                $('.profile_content').prepend(ELEMENT_NO_CS2);
                                                 return;
                                             }
                                         }
                                     });
                                 } else {
                                     $('.LoadingWrapper').hide();
-                                    $('.profile_content').prepend(ELEMENT_NO_CSGO);
+                                    $('.profile_content').prepend(ELEMENT_NO_CS2);
                                     return;
                                 }
                             }
