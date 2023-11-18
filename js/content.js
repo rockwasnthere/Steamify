@@ -31,19 +31,12 @@ const
         .append($('<div>', { class: "Bar Bar2" }))
         .append($('<div>', { class: "Bar Bar3" }))),
 
-    // No cs2 profile on faceit
-    ELEMENT_NO_CS2 =
+    // No profile on faceit
+    ELEMENT_NO_CS =
     $('<div>', {
         class: "showcase_content_bg showcase_stats_row not_found",
-        text: "No CS2 stats on Faceit"
+        text: "No cs stats on Faceit"
     }).append(EMOTE_SOTSAD),
-
-    // An error happend
-    // RESPONSE_ERROR =
-    //     $('<div>', {
-    //         class: "showcase_content_bg showcase_stats_row not_found",
-    //         text: "An error"
-    //     }).append(EMOTE_SOTSAD),
 
     ELEMENT_STATS_HEADER = `<th colspan=7>PLAYER</th>
                             <th>MVPs</th>
@@ -102,10 +95,11 @@ const sortByKills = (a, b) => {
 const addTeam = (team, matchID, side) => {
     team.players.sort(sortByKills).forEach(player => playersLayout(matchID, side, player));
 };
+// Filter maps
+const filterMaps = (map) => map.mode === '5v5' && MAPS_VETO.includes(map.label);
 // Get maps detailed stats
 const getMapsStats = (segments) => {
-    const filteredSegments = segments.filter(map => map.mode === '5v5' && MAPS_VETO.includes(map.label));
-
+    const filteredSegments = segments.filter(filterMaps);
     filteredSegments.forEach(map => $('.faceit_maps').append(mapsLayout(map)));
 };
 // Calculate average
@@ -273,11 +267,11 @@ const mapsLayout = (map) => {
 // Get 20 last games
 const getLastGames = () => {
 
-    let loadingCounter = 0;
+    let loadingCounter = 1;
 
     $.each(matchesList, game => {
 
-        if (game === 20) return;
+        if (game === 21) return;
 
         var matchesCounter = game,
             game = matchesList[game];
@@ -339,9 +333,8 @@ const getLastGames = () => {
                 $('.faceit_stats').show();
                 $('.faceit_stats_load').text(`LOADING... [${loadingCounter - 1}]`);
 
-                if (loadingCounter === (matchesList.length - 2)) {
-
-                    $('.faceit_stats_load').text(`LAST ${matchesList.length - 1} GAMES`);
+                if (loadingCounter === matchesList.length) {
+                    $('.faceit_stats_load').text(`LAST ${(matchesList.length === 21) ? 20 : matchesList.length} GAMES`);
 
                     let [HS, KD] = [
                         [],
