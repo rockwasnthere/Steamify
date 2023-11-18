@@ -644,14 +644,14 @@ if (!$(".faceit_maps")[0]) {
                                         error: data => {
                                             if (data.status === 404) {
                                                 $('.LoadingWrapper').hide();
-                                                $('.profile_content').prepend(ELEMENT_NO_CS2);
+                                                $('.profile_content').prepend(ELEMENT_NO_CS);
                                                 return;
                                             }
                                         }
                                     });
                                 } else {
                                     $('.LoadingWrapper').hide();
-                                    $('.profile_content').prepend(ELEMENT_NO_CS2);
+                                    $('.profile_content').prepend(ELEMENT_NO_CS);
                                     return;
                                 }
                             }
