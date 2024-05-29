@@ -55,20 +55,21 @@ const
 
     // Current map pool
     MAPS_VETO = [
-        // 'de_dust2',
-        // 'de_cache',
-        // 'de_train',
-        // 'de_cbble',
-        'de_nuke',
-        'de_mirage',
-        'de_inferno',
-        'de_vertigo',
-        'de_overpass',
-        'de_ancient',
-        'de_anubis'
+        'Dust2',
+        // 'Cache',
+        // 'Train',
+        // 'Cbble',
+        'Nuke',
+        'Migrage',
+        'Inferno',
+        'Vertigo',
+        // 'Overpass',
+        'Ancient',
+        'Anubis'
     ],
 
     BAN_STATUSES = [
+        undefined,
         '',
         'AVAILABLE',
         'active',
@@ -518,26 +519,35 @@ const parseSteamID = () => {
 }
 
 if (!$(".faceit_maps")[0]) {
-
     // Get steamid
     let steamID = parseSteamID();
 
     $.getJSON({
-        url: `${API_URL}/search/players?nickname=${steamID}&offset=0&limit=1`,
-        success: data => {
+        url: `${API_URL}/players?game=cs2&game_player_id=${steamID}`,
+        statusCode: {
             // If faceit profile not found return error
-            if (data.items.length === 0) {
+            404: function() {
                 $('.LoadingWrapper').hide();
                 $('.profile_content').prepend(ELEMENT_FACEIT_NOT_FOUND);
                 $('.showcase_stats_row').css('display', 'flex').css('justify-content', 'center');
                 return;
             }
-
-            faceitPlayerID = data.items[0].player_id;
+        },
+        success: data => {
+            faceitPlayerID = data.player_id;
 
             let win = lose = 0;
 
-            const { status: banned, verified } = data.items[0];
+            let banned = '';
+
+            $.getJSON({
+                url: `${API_URL}/players/${faceitPlayerID}/bans`,
+                success: data => {
+                    banned = data.items[0]?.reason;
+                }
+            });
+
+            const verified = data.verified;
 
             // Get last 20 games
             $.getJSON({
@@ -635,7 +645,7 @@ if (!$(".faceit_maps")[0]) {
                                             }
                                             // Ban bar
                                             if (!BAN_STATUSES.includes(banned)) {
-                                                $('.faceit_content').css('padding-top', '28px').prepend(`<div class="banned" data-tooltip-html="Ban reason">${banned}</div>`)
+                                                $('.faceit_content').css('padding-top', '28px').prepend(`<div class="banned" data-tooltip-html="Ban reason">Banned for: ${banned}</div>`)
                                             }
                                         },
                                         complete: () => {
