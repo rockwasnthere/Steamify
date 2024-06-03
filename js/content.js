@@ -60,7 +60,7 @@ const
         // 'Train',
         // 'Cbble',
         'Nuke',
-        'Migrage',
+        'Mirage',
         'Inferno',
         'Vertigo',
         // 'Overpass',
