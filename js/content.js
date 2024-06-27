@@ -645,7 +645,7 @@ if (!$(".faceit_maps")[0]) {
                                             }
                                             // Ban bar
                                             if (!BAN_STATUSES.includes(banned)) {
-                                                $('.faceit_content').css('padding-top', '28px').prepend(`<div class="banned" data-tooltip-html="Ban reason">Banned for: ${banned}</div>`)
+                                                $('.faceit_content').css('padding-top', '28px').prepend(`<div class="faceit_banned" data-tooltip-html="Ban reason">Banned for: ${banned}</div>`)
                                             }
                                         },
                                         complete: () => {

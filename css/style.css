@@ -6,7 +6,7 @@
     align-items: center;
 }
 
-.banned {
+.faceit_banned {
     content: "";
     position: absolute;
     background-color: #f44336;
