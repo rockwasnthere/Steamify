@@ -38,7 +38,7 @@ const
         text: "No cs stats on Faceit"
     }).append(EMOTE_SOTSAD),
 
-    ELEMENT_STATS_HEADER = `<th colspan=7>PLAYER</th>
+    ELEMENT_STATS_HEADER = `<th colspan=8>PLAYER</th>
                             <th>MVPs</th>
                             <th>TRIPLE</th>
                             <th>QUADRO</th>
@@ -130,6 +130,10 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                         <div class="value"><span class="text-white lastKD">${lastKD}</span> / ${lifetime['Average K/D Ratio']}</div>
                         <div class="label">AVG K/D</div>
                     </a>
+                    <a class="showcase_stat">
+                        <div class="value"><span class="text-white">${lifetime['ADR']}</div>
+                        <div class="label">ADR</div>
+                    </a>
                     <a class="showcase_stat" data-tooltip-html="Current streak / Max. streak">
                         <div class="value"><span class="${(lifetime['Current Win Streak'] === '0') ? 'lose' : 'win'}">${lifetime['Current Win Streak']}</span> / ${lifetime['Longest Win Streak']}</div>
                         <div class="label">STREAK</div>
@@ -188,6 +192,7 @@ const statsLayout = () => {
                     <th class="faceit_col col_header">K/D</th>
                     <th class="faceit_col col_header">K/R</th>
                     <th class="faceit_col col_header">HS</th>
+                    <th class="faceit_col col_header">ADR</th>
                     <th class="faceit_col col_header">MAP</th>
                     <th class="faceit_col col_header">DATE</th>
                     <!--<th class="faceit_col col_header">ELO</th>-->
@@ -220,6 +225,9 @@ const playersLayout = (matchID, team, player) => {
                 <span>${player.player_stats['Headshots %']}% (${player.player_stats['Headshots']})</span>
             </td>
             <td>
+                <span>${player.player_stats['ADR']}</span>
+            </td>
+            <td>
                 <span class="${(player.player_stats['MVPs'] > 0) ? 'text-white' : ''}">${player.player_stats['MVPs']}</span>
             </td>
             <td>
@@ -242,11 +250,14 @@ const mapsLayout = (map) => {
         })
         .append($('<span>', {
                 class: "kd",
-                text: "K/D:"
+                text: "K/D: "
             })
             .append($('<span>', {
                 class: (map.stats['Average K/D Ratio'] >= 1) ? 'win' : 'lose',
                 text: map.stats['Average K/D Ratio']
+            })).append($('<span>', {
+                class: "text-white",
+                text: " (" + map.stats['ADR'] +")"
             })))
         .append($('<span>', {
             class: "winrate",
@@ -318,6 +329,7 @@ const getLastGames = () => {
                                 matchList[matchesCounter].kda = player_stats['K/D Ratio'];
                                 matchList[matchesCounter].kr = player_stats['K/R Ratio'];
                                 matchList[matchesCounter].hs = player_stats['Headshots'];
+                                matchList[matchesCounter].adr = player_stats['ADR'];
                                 matchList[matchesCounter].hs_percent = player_stats['Headshots %'];
                                 matchList[matchesCounter].mvps = player_stats['MVPs'];
                                 matchList[matchesCounter].tripple = player_stats['Triple Kills'];
@@ -366,7 +378,7 @@ const getLastGames = () => {
                                 <td style="text-align:center;font-weight:bold;padding-left:0;">
                                     A
                                 </td>
-                                <td colspan=9 style="text-align:center;font-weight:bold;padding-left:0;">
+                                <td colspan=10 style="text-align:center;font-weight:bold;padding-left:0;">
                                     ABANDONED
                                 </td>
                                 <td>
@@ -399,12 +411,12 @@ const getLastGames = () => {
                                 <td>
                                     <span class="stat_${(match.kr < 1) ? 'decrease' : 'increase'}">${match.kr}</span>
                                 </td>
-
                                 <td>
                                     <span>${match.hs_percent}% (${match.hs})</span>
                                 </td>
-
-
+                                <td>
+                                    <span>${match.adr}</span>
+                                </td>
                                 <td>
                                     <span>${match.map}</span>
                                 </td>
@@ -441,7 +453,7 @@ const getLastGames = () => {
                                 </td>
                             </tr>
                             <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
-                                <th colspan=7>
+                                <th colspan=8>
                                     <span class="stat_${(winner_id === 'faction1') ? `increase` : `decrease`}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
                                 </th>
                                 <th colspan=3>
@@ -463,7 +475,7 @@ const getLastGames = () => {
                             </tr>
                             <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_A">${ELEMENT_STATS_HEADER}</tr>
                             <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
-                                <th colspan=7>
+                                <th colspan=8>
                                     <span class="stat_${(winner_id === 'faction2') ? `increase` : `decrease`}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
                                 </th>
                                 <th colspan=3>
