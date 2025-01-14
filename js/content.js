@@ -131,7 +131,7 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                         <div class="label">AVG K/D</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="text-white">${lifetime['ADR']}</div>
+                        <div class="value"><span>${lifetime['ADR']}</div>
                         <div class="label">ADR</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Current streak / Max. streak">

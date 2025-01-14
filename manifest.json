@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Steamify - Faceit stats checker",
     "description": "Steamify is a Chrome extension that displays a users detailed stats on FACEIT on their Steam profile.",
-    "version": "1.3.4",
+    "version": "1.3.5",
     "icons":
     {
         "16": "images/icon/16.png",
