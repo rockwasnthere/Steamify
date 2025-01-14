@@ -57,13 +57,13 @@ const
     MAPS_VETO = [
         'Dust2',
         // 'Cache',
-        // 'Train',
+        'Train',
         // 'Cbble',
         'Nuke',
         'Mirage',
         'Inferno',
         'Vertigo',
-        // 'Overpass',
+        'Overpass',
         'Ancient',
         'Anubis'
     ],
