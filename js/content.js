@@ -74,9 +74,11 @@ const
         'AVAILABLE',
         'active',
         'BUSY'
-    ];
+    ],
 
-let matchesLimit = 21,
+    SPONSOR_LINK = "https://skin.club/en?utm_source=sfsc&utm_medium=cpm&utm_content=sfsc_banner";
+
+let matchesLimit = 31,
     matchesList,
     faceitPlayerID,
     matchList = [],
@@ -106,20 +108,20 @@ const getMapsStats = (segments) => {
 // Calculate average
 const calcAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 // Showcase layout
-const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD, verified) => {
+const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD, verified, currentStreak, isWinStreak) => {
     return `
         <div class="showcase_faceit_content">
             <div class="showcase_stats">
                 <div class="showcase_faceit">
                     <a class="showcase_stat showcase_stat_faceit">
-                        <div class="value"><span class="text-white">LAST 20</span> / OVERALL</div>
+                        <div class="value"><span class="text-white">LAST 30</span> / OVERALL</div>
                     </a>
                     <a class="showcase_stat" data-tooltip-html="Matches played w/o leaves">
                         <div class="value">${lifetime['Matches']}</div>
                         <div class="label">MATCHES</div>
                     </a>
                     <a class="showcase_stat">
-                        <div class="value"><span class="text-white">${Math.round((win / ((lifetime['Matches'] > 20) ? 20 : lifetime['Matches'])) * 100)}</span> / ${lifetime['Win Rate %']}%</div>
+                        <div class="value"><span class="text-white">${Math.round((win / ((lifetime['Matches'] > 30) ? 30 : lifetime['Matches'])) * 100)}</span> / ${lifetime['Win Rate %']}%</div>
                         <div class="label">WINRATE</div>
                     </a>
                     <a class="showcase_stat">
@@ -134,8 +136,8 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                         <div class="value"><span>${lifetime['ADR']}</div>
                         <div class="label">ADR</div>
                     </a>
-                    <a class="showcase_stat" data-tooltip-html="Current streak / Max. streak">
-                        <div class="value"><span class="${(lifetime['Current Win Streak'] === '0') ? 'lose' : 'win'}">${lifetime['Current Win Streak']}</span> / ${lifetime['Longest Win Streak']}</div>
+                    <a class="showcase_stat" data-tooltip-html="Current streak / Max. win streak">
+                        <div class="value"><span class="${isWinStreak ? 'win' : 'lose'}">${currentStreak}</span> / ${lifetime['Longest Win Streak']}</div>
                         <div class="label">STREAK</div>
                     </a>
                 </div>
@@ -153,6 +155,7 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                         </div>
                         <div class="favorite_badge_description">
                             <div class="name ellipsis">
+                                <img class="profile_flag" src="https://community.fastly.steamstatic.com/public/images/countryflags/${profile.country}.gif">
                                 <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">${profile.nickname}</a>
                                 ${verified ? ELEMENT_VERIFIED : ''}
                             </div>
@@ -160,7 +163,7 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                                 Membership: ${profile.memberships[0]}
                             </div>
                             <div>
-                                Last 20 games: <div class="favorite_bi_win">${win}</div>:<div class="favorite_bi_lose">${lose}</div>
+                                Last 30 games: <div class="favorite_bi_win">${win}</div>:<div class="favorite_bi_lose">${lose}</div>
                             </div>
                         </div>
                     </div>
@@ -175,8 +178,9 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                     <div class="achievement_icons faceit_maps"></div>
                 </div>
             </div>
-            <div class="game_info_faceit_header faceit_stats_load">CLICK TO LOAD LAST 20 GAMES STATS</div>
-        </div>`;
+            <div class="game_info_faceit_header faceit_stats_load">CLICK TO LOAD LAST 30 GAMES STATS</div>
+        </div>
+        `;
 }
 // Stats layout
 const statsLayout = () => {
@@ -257,7 +261,7 @@ const mapsLayout = (map) => {
                 text: map.stats['Average K/D Ratio']
             })).append($('<span>', {
                 class: "text-white",
-                text: " (" + map.stats['ADR'] +")"
+                text: " (" + (map.stats['ADR'] ?? 0) + ")"
             })))
         .append($('<span>', {
             class: "winrate",
@@ -276,14 +280,14 @@ const mapsLayout = (map) => {
                 text: (parseInt(map.stats['Matches']) - parseInt(map.stats['Wins']))
             })));
 }
-// Get 20 last games
+// Get 30 last games
 const getLastGames = () => {
 
     let loadingCounter = 1;
 
     $.each(matchesList, game => {
 
-        if (game === 21) return;
+        if (game === 31) return;
 
         var matchesCounter = game,
             game = matchesList[game];
@@ -347,7 +351,7 @@ const getLastGames = () => {
                 $('.faceit_stats_load').text(`LOADING... [${loadingCounter - 1}]`);
 
                 if (loadingCounter === matchesList.length) {
-                    $('.faceit_stats_load').text(`LAST ${(matchesList.length === 21) ? 20 : matchesList.length} GAMES`);
+                    $('.faceit_stats_load').text(`LAST ${(matchesList.length === 31) ? 30 : matchesList.length} GAMES`);
 
                     let [HS, KD] = [
                         [],
@@ -357,7 +361,7 @@ const getLastGames = () => {
                     $.each(matchList, matchID => {
                         let match = matchList[matchID];
 
-                        if (matchID === 20 || matchList[matchID].match.teams[0] === undefined) return;
+                        if (matchID === 30 || matchList[matchID].match.teams[0] === undefined) return;
 
                         let team_A = match.match.teams[0][0],
                             team_B = match.match.teams[0][1],
@@ -375,10 +379,10 @@ const getLastGames = () => {
                         if (match.leaver) {
                             $('.faceit_stats_tbody').append(
                                 `<tr data-match-id="${matchID}" class="faceit_row faceit_stats_leaver">
-                                <td style="text-align:center;font-weight:bold;padding-left:0;">
+                                <td class="faceit_stats_td">
                                     A
                                 </td>
-                                <td colspan=10 style="text-align:center;font-weight:bold;padding-left:0;">
+                                <td class="faceit_stats_td" colspan=10>
                                     ABANDONED
                                 </td>
                                 <td>
@@ -392,7 +396,7 @@ const getLastGames = () => {
                         } else {
                             $('.faceit_stats_tbody').append(`
                             <tr data-match-id="${matchID}" class="faceit_row faceit_stats_${(is_winner) ? `win` : `lose`}">
-                                <td style="text-align:center;font-weight:bold;padding-left:0;">
+                                <td class="faceit_stats_td">
                                     ${(is_winner) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`}
                                 </td>
                                 <td>
@@ -456,21 +460,10 @@ const getLastGames = () => {
                                 <th colspan=8>
                                     <span class="stat_${(winner_id === 'faction1') ? `increase` : `decrease`}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
                                 </th>
-                                <th colspan=3>
+                                <th colspan=4>
                                     <span>
                                         FINAL SCORE: <span class="text-white">${team_A.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_A.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_A.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_A.team_stats['Overtime score']}</span>)
                                     </span>
-                                </th>
-                                <th class="faceit_arrow">
-                                ${(match.demo_url === 'empty') ?
-                                    `` :
-                                    `<a href="${match.demo_url}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Download demo (directly from faceit)">
-                                    <div class="btn_black btn_details btn_small">
-                                        <span>
-                                            <span class="ico16 btn_active bluearrow_down"></span>
-                                        </span>
-                                    </div>
-                                </a>`}
                                 </th>
                             </tr>
                             <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_A">${ELEMENT_STATS_HEADER}</tr>
@@ -478,12 +471,10 @@ const getLastGames = () => {
                                 <th colspan=8>
                                     <span class="stat_${(winner_id === 'faction2') ? `increase` : `decrease`}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
                                 </th>
-                                <th colspan=3>
+                                <th colspan=4>
                                     <span>
                                         FINAL SCORE: <span class="text-white">${team_B.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_B.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_B.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_B.team_stats['Overtime score']}</span>)
                                     </span>
-                                </th>
-                                <th>
                                 </th>
                             </tr>
                             <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_B">${ELEMENT_STATS_HEADER}</tr>`);
@@ -529,6 +520,42 @@ const getSteamId64 = (player) => {
 const parseSteamID = () => {
     return document.querySelector('.responsive_page_template_content').innerHTML.split('script')[2].split('"')[8];
 }
+// show sponsors
+const showSponsor = () => {
+    faceitContentSponsorLayout();
+
+    // Popup Logic
+    const sponsorBtn = document.querySelector('.why-sponsor-button');
+    const popup = document.getElementById('sponsorExplainerPopup');
+    const closeBtn = document.querySelector('.popup-close');
+
+    sponsorBtn?.addEventListener('click', () => {
+        popup && (popup.style.display = 'flex');
+    });
+
+    closeBtn?.addEventListener('click', () => {
+        popup && (popup.style.display = 'none');
+    });
+
+    popup?.addEventListener('click', (e) => {
+        if (e.target === popup) {
+            popup.style.display = 'none';
+        }
+    });
+};
+
+const faceitContentSponsorLayout = () => {
+    const adHTML = `
+        <div class="sponsor-container sponsor-container-faceit">
+            <a href="${SPONSOR_LINK}" target="_blank" class="sponsor-link-faceit">
+                <img src="${chrome.runtime.getURL('images/sponsor_932x140.png')}" width="932" height="140" alt="Sponsor">
+            </a>
+            <div class="why-sponsor-button">Why do I see this ad?</div>
+        </div>`;
+
+    $('.not_found, .faceit_content').prepend(adHTML);
+}
+
 
 if (!$(".faceit_maps")[0]) {
     // Get steamid
@@ -542,6 +569,7 @@ if (!$(".faceit_maps")[0]) {
                 $('.LoadingWrapper').hide();
                 $('.profile_content').prepend(ELEMENT_FACEIT_NOT_FOUND);
                 $('.showcase_stats_row').css('display', 'flex').css('justify-content', 'center');
+                showSponsor();
                 return;
             }
         },
@@ -561,7 +589,7 @@ if (!$(".faceit_maps")[0]) {
 
             const verified = data.verified;
 
-            // Get last 20 games
+            // Get last 30 games
             $.getJSON({
                 url: `${API_URL}/players/${faceitPlayerID}/history?from=0&game=cs2&limit=${matchesLimit}`,
                 success: data => {
@@ -571,7 +599,7 @@ if (!$(".faceit_maps")[0]) {
                     if (matchesList.length > 0) {
                         $('.private_profile').addClass('DefaultTheme');
                         $('.private_profile .profile_content').css('padding-bottom', 8);
-                        $('.profile_content').css('min-height', 'auto').prepend('<div class="showcase_content_bg showcase_stats_row faceit_content" style="display:none"></div>');
+                        $('.profile_content').css('min-height', '434px').prepend('<div class="showcase_content_bg showcase_stats_row faceit_content" style="display:none"></div>');
                         $('.faceit_content').append(statsLayout());
 
                         $.each(matchesList, matchID => {
@@ -584,7 +612,7 @@ if (!$(".faceit_maps")[0]) {
                                 }
                             });
 
-                            if (matchID === 20) return;
+                            if (matchID === 30) return;
 
                             $.each(match.teams, faction => {
                                 $.each(match.teams[faction].players, player => {
@@ -606,6 +634,21 @@ if (!$(".faceit_maps")[0]) {
                                 });
                             });
                         });
+
+                        // Calculate current streak (wins or losses)
+                        let currentStreak = 0;
+                        let isWinStreak = true;
+                        if (matchList.length > 0 && matchList[0].match.winner !== undefined) {
+                            isWinStreak = matchList[0].match.winner === 1;
+                            for (let i = 0; i < matchList.length; i++) {
+                                if (matchList[i].match.winner === undefined) break;
+                                if ((matchList[i].match.winner === 1) === isWinStreak) {
+                                    currentStreak++;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
 
                         if (matchesList.length < matchesLimit) matchesLimit = matchesList.length;
 
@@ -645,7 +688,9 @@ if (!$(".faceit_maps")[0]) {
                                                     lose,
                                                     lastHS,
                                                     lastKD,
-                                                    verified
+                                                    verified,
+                                                    currentStreak,
+                                                    isWinStreak
                                                 )
                                             );
 
@@ -662,6 +707,8 @@ if (!$(".faceit_maps")[0]) {
                                         },
                                         complete: () => {
                                             $('.faceit_content').css('display', 'flex');
+                                            // Show sponsor block
+                                            showSponsor();
                                         },
                                         error: data => {
                                             if (data.status === 404) {
@@ -692,7 +739,25 @@ if (!$(".faceit_maps")[0]) {
         }
     });
 }
-// Get last 20 games when click on button
+// Sponsor popup
+$('body')
+    .append(`
+        <div class="sponsor-explainer-popup" id="sponsorExplainerPopup">
+            <div class="popup-content">
+            <div class="popup-header">
+                <span>About This Ad</span>
+                <button class="popup-close">&times;</button>
+            </div>
+            <div class="popup-body">
+                <ul>
+                <li>No tracking or data collection</li>
+                <li>Only shows offers relevant to <a href="https://chromewebstore.google.com/detail/steamify-faceit-stats-che/hgapfodjjnkkoebpfbcfhhenkklchngn" target="_blank">[Steamify - Faceit stats checker]</a></li>
+                </ul>
+            </div>
+            </div>
+        </div>`
+    );
+// Get last 30 games when click on button
 $(document).on('click', '.faceit_stats_load', () => {
     if (!$(".faceit_row")[0]) {
         getLastGames();

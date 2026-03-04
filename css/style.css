@@ -1,6 +1,5 @@
 .faceit_content {
     position: relative;
-    /* display: none; */
     justify-content: space-between;
     flex-wrap: wrap;
     align-items: center;
@@ -149,6 +148,9 @@
     font-size: 18px;
     line-height: 18px;
     text-align: center;
+    background-color: #4c3634 !important;
+    height: 100%;
+    display: block !important;
 }
 
 .faceit_badge .favorite_badge_icon::after {
@@ -224,6 +226,12 @@
     color: #000;
     margin-top: 8px;
     background-color: #ff9800;
+}
+
+.faceit_stats_td {
+    text-align:center;
+    font-weight:bold;
+    padding-left:0;
 }
 
 .faceit_badge .favorite_badge_description {
@@ -314,4 +322,108 @@
 
 .faceit_stats_details_header th {
     padding: 2px 0px 2px 8px;
+}
+
+.why-sponsor-button {
+    position: absolute;
+    font-family: "Manrope", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3px 6px;
+    box-sizing: border-box;
+    font-size: 11px;
+    background-color: #2c3337;
+    color: #a9b2b9;
+    cursor: pointer;
+    transition: .2s ease-in;
+    width: 100%;
+}
+
+.why-sponsor-button:hover {
+    background-color: #3a4248;
+    color: #fff;
+}
+
+.sponsor-link-faceit {
+    border: 2px solid #14293b;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+}
+
+.sponsor-container {
+    position: relative;
+    padding: 10px 10px 31px 10px;
+}
+
+.sponsor-container-faceit {
+    padding: 0;
+    position: relative;
+    margin-bottom: 31px;
+}
+
+.sponsor-explainer-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 100000;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-content {
+    background: #1b2838;
+    width: auto;
+    border-radius: 3px;
+    border: 1px solid #2a475e;
+    box-shadow: 0 0 10px rgba(0, 102, 153, 0.5);
+}
+
+.popup-header {
+    background: linear-gradient(to right, #417a9b, #2a475e);
+    color: #d9e3ea;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.popup-close {
+    background: transparent;
+    border: none;
+    color: #66c0f4;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.popup-body {
+    padding: 12px;
+    color: #c6d4df;
+    font-size: 12px;
+}
+
+.popup-body ul {
+    padding-left: 16px;
+    margin: 0;
+}
+
+.popup-body li {
+    margin-bottom: 6px;
+    list-style-type: none;
+    position: relative;
+}
+
+.popup-body li:before {
+    content: "•";
+    color: #66c0f4;
+    position: absolute;
+    left: -12px;
 }
