@@ -37,82 +37,251 @@
 
 .faceit_maps {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.faceit_maps>.plus_more {
-    line-height: 55px !important;
-    border: 0 !important;
-    height: 55px !important;
-    width: 110px !important;
-    background-size: cover;
-}
-
-.faceit_maps>.game_info_achievement {
-    position: relative;
-}
-
-.wr {
-    position: absolute;
-    font-size: 12px;
-    bottom: 0;
-    right: 0;
+.faceit_maps_header {
+    font-size: 1em;
     font-weight: bold;
-    line-height: 12px;
-    height: 14px;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    color: #b0b0b0;
+    margin-bottom: 4px;
+    position: relative;
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 6px;
 }
 
-.wr>.lose,
-.kd>.lose {
-    color: tomato;
+.faceit_maps_cog {
+    cursor: pointer;
+    font-size: 11px;
+    color: #808080;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 1px 6px;
+    transition: all 0.2s;
 }
 
-.wr>.win,
-.kd>.win {
+.faceit_maps_cog:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.faceit_maps_dropdown {
+    position: fixed;
+    background: #1b2838;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 6px 0;
+    z-index: 9999;
+    min-width: 140px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.faceit_maps_option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: #b0b0b0;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.faceit_maps_option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.faceit_maps_option input {
+    cursor: pointer;
+}
+
+.faceit_map_box {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 4px 10px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.faceit_map_box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+}
+
+.faceit_map_box > * {
+    position: relative;
+    z-index: 1;
+}
+
+.faceit_map_name {
+    font-weight: bold;
+    color: #fff;
+    font-size: 11px;
+    text-transform: uppercase;
+    width: 70px;
+    flex-shrink: 0;
+}
+
+.faceit_map_stats_row {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.faceit_map_stat {
+    font-size: 11px;
+    font-weight: bold;
+    width: 70px;
+    flex-shrink: 0;
+}
+
+.faceit_map_stat_label {
+    color: #808080;
+}
+
+.faceit_map_stat .win {
     color: #8bc34a;
 }
 
-.kd {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 12px;
-    font-weight: bold;
-    height: 14px;
-    line-height: 14px;
-    background: rgba(0, 0, 0, 0.5);
+.faceit_map_stat .lose {
+    color: tomato;
+}
+
+
+.faceit_level_banner {
     width: 100%;
-}
-
-.winrate {
-    font-weight: bold;
-    font-size: 24px;
-    z-index: 9;
     position: relative;
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
 
-.faceit_maps>.game_info_achievement:before {
+.faceit_level_banner::before {
     content: "";
+    position: absolute;
     top: 0;
     left: 0;
-    position: absolute;
-    height: 100%;
     width: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.faceit_level_banner_content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    gap: 8px;
+}
+
+.faceit_level_icon {
+    display: block;
+    line-height: 0;
+    flex-shrink: 0;
+}
+
+.faceit_level_img {
+    width: 28px;
+    height: 28px;
+}
+
+.faceit_level_info {
+    display: flex;
+    flex-direction: column;
+}
+
+.faceit_level_elo {
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.faceit_level_name {
+    font-size: 12px;
+    color: #b0b0b0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.faceit_level_sub {
+    font-size: 10px;
+    color: #808080;
+}
+
+.faceit_level_flag {
+    width: 16px;
+    height: 11px;
+}
+
+.faceit_level_membership {
+    color: #808080;
+}
+
+.faceit_level_name a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.faceit_level_name a:hover {
+    color: #fff;
 }
 
 .showcase_faceit {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+}
+
+.showcase_faceit_header {
+    font-size: 1em;
+    font-weight: bold;
+    color: #b0b0b0;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.showcase_faceit_header .text-white {
+    font-size: 1.15em;
+    color: #fff;
+}
+
+.showcase_faceit_boxes {
+    display: flex;
+    gap: 6px;
+}
+
+.showcase_stat_bordered {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 8px 12px;
+    flex: 1;
+    text-align: left !important;
 }
 
 .faceit_badge {
     width: 260px;
+    display: none;
 }
 
 .faceit_badge>.profile_header_badge {
@@ -135,7 +304,8 @@
     cursor: default;
 }
 
-.showcase_faceit>.showcase_stat {
+.showcase_faceit>.showcase_stat,
+.showcase_faceit_boxes>.showcase_stat {
     margin-left: 0 !important;
 }
 
@@ -184,8 +354,7 @@
 .showcase_stats {
     display: flex;
     flex-direction: column;
-    width: 620px;
-    margin-right: 20px;
+    width: 100%;
 }
 
 .showcase_stat_faceit {
@@ -356,12 +525,14 @@
 .sponsor-container {
     position: relative;
     padding: 10px 10px 31px 10px;
+    display: none !important;
 }
 
 .sponsor-container-faceit {
     padding: 0;
     position: relative;
     margin-bottom: 31px;
+    display: none !important;
 }
 
 .sponsor-explainer-popup {

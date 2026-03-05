@@ -53,20 +53,33 @@ const
                             11.2l4.571 4.8 6.095-8-6.095 4.8-4.571-1.6z"></path>
                         </svg>`,
 
-    // Current map pool
-    MAPS_VETO = [
-        'Dust2',
-        // 'Cache',
-        'Train',
-        // 'Cbble',
-        'Nuke',
-        'Mirage',
-        'Inferno',
-        'Vertigo',
-        'Overpass',
+    // All maps
+    ALL_MAPS = [
         'Ancient',
-        'Anubis'
+        'Anubis',
+        'Cache',
+        'Cbble',
+        'Dust2',
+        'Inferno',
+        'Mirage',
+        'Nuke',
+        'Overpass',
+        'Train',
+        'Vertigo'
     ],
+
+    // Default active map pool
+    MAPS_VETO_DEFAULT = [
+        'Ancient',
+        'Anubis',
+        'Dust2',
+        'Inferno',
+        'Mirage',
+        'Nuke',
+        'Overpass'
+    ],
+
+    MAPS_VETO = [...MAPS_VETO_DEFAULT],
 
     BAN_STATUSES = [
         undefined,
@@ -108,76 +121,81 @@ const getMapsStats = (segments) => {
 // Calculate average
 const calcAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 // Showcase layout
+// Get glow color based on FACEIT level
+const getLevelColor = (level) => {
+    if (level <= 1) return '#CDCDCD';
+    if (level <= 3) return '#1CE400';
+    if (level <= 7) return '#FFC800';
+    if (level <= 9) return '#FF6309';
+    return '#FE1F00';
+};
 const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD, verified, currentStreak, isWinStreak) => {
+    const glowColor = getLevelColor(level);
     return `
         <div class="showcase_faceit_content">
             <div class="showcase_stats">
-                <div class="showcase_faceit">
-                    <a class="showcase_stat showcase_stat_faceit">
-                        <div class="value"><span class="text-white">LAST 30</span> / OVERALL</div>
-                    </a>
-                    <a class="showcase_stat" data-tooltip-html="Matches played w/o leaves">
-                        <div class="value">${lifetime['Matches']}</div>
-                        <div class="label">MATCHES</div>
-                    </a>
-                    <a class="showcase_stat">
-                        <div class="value"><span class="text-white">${Math.round((win / ((lifetime['Matches'] > 30) ? 30 : lifetime['Matches'])) * 100)}</span> / ${lifetime['Win Rate %']}%</div>
-                        <div class="label">WINRATE</div>
-                    </a>
-                    <a class="showcase_stat">
-                        <div class="value"><span class="text-white lastHS">${lastHS}</span> / ${lifetime['Average Headshots %']}%</div>
-                        <div class="label">AVG HS%</div>
-                    </a>
-                    <a class="showcase_stat">
-                        <div class="value"><span class="text-white lastKD">${lastKD}</span> / ${lifetime['Average K/D Ratio']}</div>
-                        <div class="label">AVG K/D</div>
-                    </a>
-                    <a class="showcase_stat">
-                        <div class="value"><span>${lifetime['ADR']}</div>
-                        <div class="label">ADR</div>
-                    </a>
-                    <a class="showcase_stat" data-tooltip-html="Current streak / Max. win streak">
-                        <div class="value"><span class="${isWinStreak ? 'win' : 'lose'}">${currentStreak}</span> / ${lifetime['Longest Win Streak']}</div>
-                        <div class="label">STREAK</div>
-                    </a>
-                </div>
-            </div>
-            <div class="faceit_badge">
-                <div class="profile_header_badge" style="background-image: url(${profile.cover_image});">
-                    <div class="favorite_badge">
-                        <style>
-                            .faceit_badge .favorite_badge_icon::after {content: "${elo}"}
-                        </style>
-                        <div class="favorite_badge_icon" data-tooltip-html="Level and ELO on Faceit">
-                            <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">
-                                <img src="${chrome.runtime.getURL(`images/lvl_${level}.svg`)}" class="badge_icon small">
-                            </a>
-                        </div>
-                        <div class="favorite_badge_description">
-                            <div class="name ellipsis">
-                                <img class="profile_flag" src="https://community.fastly.steamstatic.com/public/images/countryflags/${profile.country}.gif">
+                <div class="faceit_level_banner" style="background-image: url(${profile.cover_image});">
+                    <div class="faceit_level_banner_content">
+                        <a class="faceit_level_icon" target="_blank" href="https://faceit.com/en/players/${profile.nickname}" style="filter: drop-shadow(0 0 8px ${glowColor}) drop-shadow(0 0 16px ${glowColor});">
+                            <img src="${chrome.runtime.getURL(`images/lvl_${level}.svg`)}" class="faceit_level_img">
+                        </a>
+                        <div class="faceit_level_info">
+                            <div class="faceit_level_name">
+                                <img class="faceit_level_flag" src="https://community.fastly.steamstatic.com/public/images/countryflags/${profile.country}.gif">
                                 <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">${profile.nickname}</a>
                                 ${verified ? ELEMENT_VERIFIED : ''}
                             </div>
-                            <div>
-                                Membership: ${profile.memberships[0]}
-                            </div>
-                            <div>
-                                Last 30 games: <div class="favorite_bi_win">${win}</div>:<div class="favorite_bi_lose">${lose}</div>
-                            </div>
+                            <div class="faceit_level_sub"><span class="faceit_level_elo">${elo} ELO</span> · <span class="faceit_level_membership">${profile.memberships[0]}</span></div>
                         </div>
+                    </div>
+                </div>
+                <div class="showcase_faceit">
+                    <div class="showcase_faceit_header">
+                        <span class="text-white">LAST 30</span> <span>/ OVERALL</span>
+                    </div>
+                    <div class="showcase_faceit_boxes">
+                        <a class="showcase_stat showcase_stat_bordered" data-tooltip-html="Matches played w/o leaves">
+                            <div class="value">${lifetime['Matches']}</div>
+                            <div class="label">Matches</div>
+                        </a>
+                        <a class="showcase_stat showcase_stat_bordered">
+                            <div class="value"><span class="text-white">${Math.round((win / ((lifetime['Matches'] > 30) ? 30 : lifetime['Matches'])) * 100)}%</span> / ${lifetime['Win Rate %']}%</div>
+                            <div class="label">Winrate</div>
+                        </a>
+                        <a class="showcase_stat showcase_stat_bordered">
+                            <div class="value"><span class="text-white lastKD">${lastKD}</span> / ${lifetime['Average K/D Ratio']}</div>
+                            <div class="label">K/D</div>
+                        </a>
+                        <a class="showcase_stat showcase_stat_bordered">
+                            <div class="value"><span class="text-white lastHS">${lastHS}</span> / ${lifetime['Average Headshots %']}%</div>
+                            <div class="label">HS %</div>
+                        </a>
+                        <a class="showcase_stat showcase_stat_bordered">
+                            <div class="value"><span>${lifetime['ADR']}</div>
+                            <div class="label">ADR</div>
+                        </a>
+                        <a class="showcase_stat showcase_stat_bordered" data-tooltip-html="Last 30 avg. kills">
+                            <div class="value"><span class="text-white lastKills">?</span></div>
+                            <div class="label">Avg Kills</div>
+                        </a>
+                        <a class="showcase_stat showcase_stat_bordered" data-tooltip-html="Current streak / Max. win streak">
+                            <div class="value"><span class="${isWinStreak ? 'win' : 'lose'}">${isWinStreak ? '▲' : '▼'} ${currentStreak}</span> / ${lifetime['Longest Win Streak']}</div>
+                            <div class="label">Streak</div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
         <div style="clear: left;"></div>
         <div class="game_info_stats">
-            <div class="game_info_faceit_header">Maps played</div>
-            <div class="game_info_achievements_only_ctn">
-                <div class="game_info_achievements">
-                    <div class="achievement_icons faceit_maps"></div>
+            <div class="faceit_maps_header">
+                MAPS PLAYED
+                <span class="faceit_maps_cog" title="Filter maps">⚙</span>
+                <div class="faceit_maps_dropdown" style="display:none;">
+                    ${ALL_MAPS.map(m => `<label class="faceit_maps_option"><input type="checkbox" value="${m}" ${MAPS_VETO.includes(m) ? 'checked' : ''}> ${m}</label>`).join('')}
                 </div>
             </div>
+            <div class="faceit_maps"></div>
             <div class="game_info_faceit_header faceit_stats_load">CLICK TO LOAD LAST 30 GAMES STATS</div>
         </div>
         `;
@@ -247,38 +265,15 @@ const playersLayout = (matchID, team, player) => {
 }
 // Maps layout
 const mapsLayout = (map) => {
-    return $('<div>', {
-            class: "game_info_achievement plus_more",
-            'data-tooltip-html': map.label,
-            style: `background-image: url(${map.img_small})`
-        })
-        .append($('<span>', {
-                class: "kd",
-                text: "K/D: "
-            })
-            .append($('<span>', {
-                class: (map.stats['Average K/D Ratio'] >= 1) ? 'win' : 'lose',
-                text: map.stats['Average K/D Ratio']
-            })).append($('<span>', {
-                class: "text-white",
-                text: " (" + (map.stats['ADR'] ?? 0) + ")"
-            })))
-        .append($('<span>', {
-            class: "winrate",
-            text: `${map.stats['Win Rate %']}%`
-        }))
-        .append($('<span>', {
-                class: "wr",
-            })
-            .append($('<span>', {
-                class: "win",
-                text: map.stats['Wins']
-            }))
-            .append(':')
-            .append($('<span>', {
-                class: "lose",
-                text: (parseInt(map.stats['Matches']) - parseInt(map.stats['Wins']))
-            })));
+    const losses = parseInt(map.stats['Matches']) - parseInt(map.stats['Wins']);
+    return $('<div>', { class: "faceit_map_box", style: `background-image: url(${map.img_small})` })
+        .append($('<div>', { class: "faceit_map_name", text: map.label }))
+        .append($('<div>', { class: "faceit_map_stats_row" })
+            .append($('<span>', { class: "faceit_map_stat" }).append($('<span>', { class: "win", text: map.stats['Wins'] })).append(':').append($('<span>', { class: "lose", text: losses })))
+            .append($('<span>', { class: "faceit_map_stat" }).append($('<span>', { class: "faceit_map_stat_label", text: "WR " })).append($('<span>', { class: (parseInt(map.stats['Win Rate %']) >= 50) ? 'win' : 'lose', text: `${map.stats['Win Rate %']}%` })))
+            .append($('<span>', { class: "faceit_map_stat" }).append($('<span>', { class: "faceit_map_stat_label", text: "K/D " })).append($('<span>', { class: (map.stats['Average K/D Ratio'] >= 1) ? 'win' : 'lose', text: map.stats['Average K/D Ratio'] })))
+            .append($('<span>', { class: "faceit_map_stat" }).append($('<span>', { class: "faceit_map_stat_label", text: "ADR " })).append($('<span>', { class: "text-white", text: (map.stats['ADR'] ?? 0) })))
+        );
 }
 // Get 30 last games
 const getLastGames = () => {
@@ -353,7 +348,8 @@ const getLastGames = () => {
                 if (loadingCounter === matchesList.length) {
                     $('.faceit_stats_load').text(`LAST ${(matchesList.length === 31) ? 30 : matchesList.length} GAMES`);
 
-                    let [HS, KD] = [
+                    let [HS, KD, Kills] = [
+                        [],
                         [],
                         []
                     ];
@@ -371,10 +367,12 @@ const getLastGames = () => {
                         if (!match.leaver) {
                             KD.push(parseFloat(match.kda));
                             HS.push(parseFloat(match.hs_percent));
+                            Kills.push(parseFloat(match.kills));
                         }
 
                         $('.lastHS').text(calcAvg(HS).toFixed(0));
                         $('.lastKD').text(calcAvg(KD).toFixed(2));
+                        $('.lastKills').text(Math.round(calcAvg(Kills)));
 
                         if (match.leaver) {
                             $('.faceit_stats_tbody').append(
@@ -557,6 +555,14 @@ const faceitContentSponsorLayout = () => {
 }
 
 
+// Load saved map filter
+chrome.storage.local.get('steamify_maps_veto', (result) => {
+    if (result.steamify_maps_veto) {
+        MAPS_VETO.length = 0;
+        result.steamify_maps_veto.forEach(m => MAPS_VETO.push(m));
+    }
+});
+
 if (!$(".faceit_maps")[0]) {
     // Get steamid
     let steamID = parseSteamID();
@@ -694,6 +700,7 @@ if (!$(".faceit_maps")[0]) {
                                                 )
                                             );
 
+                                            window._faceit_segments = segments;
                                             getMapsStats(segments);
 
                                             // Check if maps played length equals to MapsVeto length to center them
@@ -771,4 +778,34 @@ $(document).on('click', '.filter_tag_button_ctn', (e) => {
 // Open player steam profile
 $(document).on('click', '.text-primary', (e) => {
     getSteamId64($(e.currentTarget));
+});
+// Toggle maps dropdown
+$(document).on('click', '.faceit_maps_cog', function (e) {
+    e.stopPropagation();
+    const dropdown = $('.faceit_maps_dropdown');
+    if (dropdown.is(':visible')) {
+        dropdown.hide();
+    } else {
+        const rect = this.getBoundingClientRect();
+        dropdown.css({ top: rect.bottom + 4, left: rect.left }).show();
+    }
+});
+// Close dropdown when clicking outside or scrolling
+$(document).on('click', (e) => {
+    if (!$(e.target).closest('.faceit_maps_header').length && !$(e.target).closest('.faceit_maps_dropdown').length) {
+        $('.faceit_maps_dropdown').hide();
+    }
+});
+// Map filter toggle
+$(document).on('change', '.faceit_maps_option input', function () {
+    const map = $(this).val();
+    if ($(this).is(':checked')) {
+        if (!MAPS_VETO.includes(map)) MAPS_VETO.push(map);
+    } else {
+        MAPS_VETO.splice(MAPS_VETO.indexOf(map), 1);
+    }
+    chrome.storage.local.set({ steamify_maps_veto: MAPS_VETO });
+    // Re-render maps
+    $('.faceit_maps').empty();
+    if (window._faceit_segments) getMapsStats(window._faceit_segments);
 });
