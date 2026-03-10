@@ -129,7 +129,7 @@ const getLevelColor = (level) => {
     if (level <= 9) return '#FF6309';
     return '#FE1F00';
 };
-const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD, verified, currentStreak, isWinStreak) => {
+const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD, verified, currentStreak, isWinStreak, registeredDate) => {
     const glowColor = getLevelColor(level);
     return `
         <div class="showcase_faceit_content">
@@ -145,7 +145,7 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                                 <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">${profile.nickname}</a>
                                 ${verified ? ELEMENT_VERIFIED : ''}
                             </div>
-                            <div class="faceit_level_sub"><span class="faceit_level_elo">${elo} ELO</span> · <span class="faceit_level_membership">${profile.memberships[0]}</span></div>
+                            <div class="faceit_level_sub"><span class="faceit_level_elo">${elo} ELO</span> · <span class="faceit_level_membership">${profile.memberships[0]}</span>${registeredDate ? ` · <span class="faceit_level_registered" data-tooltip-html="Registered on FACEIT">since ${registeredDate}</span>` : ''}</div>
                         </div>
                     </div>
                 </div>
@@ -651,6 +651,11 @@ if (!$(".faceit_maps")[0]) {
             });
 
             const verified = data.verified;
+            const registeredDate = (() => {
+                const d = data.activated_at ? new Date(data.activated_at) : null;
+                if (!d || isNaN(d)) return null;
+                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            })();
 
             // Get last 30 games
             $.getJSON({
@@ -753,7 +758,8 @@ if (!$(".faceit_maps")[0]) {
                                                     lastKD,
                                                     verified,
                                                     currentStreak,
-                                                    isWinStreak
+                                                    isWinStreak,
+                                                    registeredDate
                                                 )
                                             );
 
