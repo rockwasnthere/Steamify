@@ -442,12 +442,22 @@ const parseSteamID = () => {
 }
 // show sponsors
 const showSponsor = () => {
+    if (localStorage.getItem('steamify_sponsor_hidden') === '1') return;
+
     faceitContentSponsorLayout();
 
     // Popup Logic
     const sponsorBtn = document.querySelector('.why-sponsor-button');
     const popup = document.getElementById('sponsorExplainerPopup');
     const closeBtn = document.querySelector('.popup-close');
+    const hideBtn = document.querySelector('.sponsor-hide-button');
+    const popupHideBtn = document.querySelector('.popup-hide-button');
+
+    const hideSponsor = () => {
+        localStorage.setItem('steamify_sponsor_hidden', '1');
+        document.querySelector('.sponsor-container-faceit')?.remove();
+        popup && (popup.style.display = 'none');
+    };
 
     sponsorBtn?.addEventListener('click', () => {
         popup && (popup.style.display = 'flex');
@@ -458,10 +468,15 @@ const showSponsor = () => {
     });
 
     popup?.addEventListener('click', (e) => {
-        if (e.target === popup) {
-            popup.style.display = 'none';
-        }
+        if (e.target === popup) popup.style.display = 'none';
     });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popup?.style.display === 'flex') popup.style.display = 'none';
+    });
+
+    hideBtn?.addEventListener('click', hideSponsor);
+    popupHideBtn?.addEventListener('click', hideSponsor);
 };
 
 const faceitContentSponsorLayout = () => {
@@ -470,7 +485,10 @@ const faceitContentSponsorLayout = () => {
             <a href="${SPONSOR_LINK}" target="_blank" class="sponsor-link-faceit">
                 <img src="${chrome.runtime.getURL('images/sponsor_932x140.png')}" width="932" height="140" alt="Sponsor">
             </a>
-            <div class="why-sponsor-button">Why do I see this ad?</div>
+            <div class="sponsor-bar">
+                <div class="why-sponsor-button">Why do I see this ad?</div>
+                <div class="sponsor-hide-button">✕ Hide</div>
+            </div>
         </div>`;
 
     $('.not_found, .faceit_content').prepend(adHTML);
@@ -678,10 +696,14 @@ $('body')
                 <button class="popup-close">&times;</button>
             </div>
             <div class="popup-body">
+                <p class="popup-intro"><a href="https://chromewebstore.google.com/detail/steamify-faceit-stats-che/hgapfodjjnkkoebpfbcfhhenkklchngn" target="_blank" style="color:#fff;font-weight:700;text-decoration:none;">Steamify</a> is a passion project built and maintained by a solo developer — completely free.</p>
+                <p class="popup-intro">There are no hosting or API costs — the only thing that goes into this is personal time. This ad is a small way to get something back for the hours spent building and maintaining it.</p>
                 <ul>
-                <li>No tracking or data collection</li>
-                <li>Only shows offers relevant to <a href="https://chromewebstore.google.com/detail/steamify-faceit-stats-che/hgapfodjjnkkoebpfbcfhhenkklchngn" target="_blank">[Steamify - Faceit stats checker]</a></li>
+                <li>No tracking or personal data collection, ever</li>
+                <li>Only relevant gaming offers — nothing random</li>
                 </ul>
+                <p class="popup-intro popup-intro-note">If you'd rather not see it, no hard feelings — you can hide it forever below. But if you do keep it, thank you. It genuinely makes a difference. 🙏</p>
+                <div class="popup-hide-button">✕ Hide this ad forever</div>
             </div>
             </div>
         </div>`

@@ -501,46 +501,83 @@
     padding: 2px 0px 2px 8px;
 }
 
-.why-sponsor-button {
-    position: absolute;
-    font-family: "Manrope", sans-serif;
+.sponsor-bar {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3px 6px;
-    box-sizing: border-box;
-    font-size: 11px;
-    background-color: #2c3337;
-    color: #a9b2b9;
+    align-items: stretch;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+}
+
+.why-sponsor-button {
+    font-family: "Manrope", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #9099a1;
     cursor: pointer;
-    transition: .2s ease-in;
-    width: 100%;
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
 }
 
 .why-sponsor-button:hover {
-    background-color: #3a4248;
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
 }
 
+.sponsor-hide-button {
+    font-family: "Manrope", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #ff5e5e;
+    cursor: pointer;
+    padding: 5px 12px;
+    background: rgba(255, 94, 94, 0.08);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.sponsor-hide-button:hover {
+    background: rgba(255, 94, 94, 0.2);
+    color: #ff8080;
+}
+
 .sponsor-link-faceit {
-    border: 2px solid #14293b;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 4px 4px 0 0;
     margin: 0;
     padding: 0;
     overflow: hidden;
     display: flex;
 }
 
+.sponsor-link-faceit img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 .sponsor-container {
     position: relative;
     padding: 10px 10px 31px 10px;
-    display: none !important;
 }
 
 .sponsor-container-faceit {
     padding: 0;
     position: relative;
-    margin-bottom: 31px;
-    display: none !important;
+    margin-bottom: 8px;
+    width: 100%;
+    display: block;
 }
 
 .sponsor-explainer-popup {
@@ -550,7 +587,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.6);
     z-index: 100000;
     align-items: center;
     justify-content: center;
@@ -558,53 +595,118 @@
 
 .popup-content {
     background: #1b2838;
-    width: auto;
-    border-radius: 3px;
-    border: 1px solid #2a475e;
-    box-shadow: 0 0 10px rgba(0, 102, 153, 0.5);
+    width: 480px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    font-family: "Manrope", sans-serif;
 }
 
 .popup-header {
-    background: linear-gradient(to right, #417a9b, #2a475e);
-    color: #d9e3ea;
-    padding: 8px 12px;
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
-    font-weight: bold;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9099a1;
 }
 
 .popup-close {
     background: transparent;
     border: none;
-    color: #66c0f4;
-    font-size: 18px;
+    color: #9099a1;
+    font-size: 16px;
     cursor: pointer;
     line-height: 1;
+    padding: 0;
+    transition: color 0.15s;
+}
+
+.popup-close:hover {
+    color: #fff;
 }
 
 .popup-body {
-    padding: 12px;
-    color: #c6d4df;
-    font-size: 12px;
+    padding: 14px;
+    color: #9099a1;
+    font-size: 11px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.popup-intro {
+    margin: 0;
+    color: #9099a1;
+    line-height: 1.65;
+}
+
+.popup-intro-note {
+    color: rgba(144, 153, 161, 0.7);
+    font-style: italic;
 }
 
 .popup-body ul {
-    padding-left: 16px;
+    padding-left: 0;
     margin: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .popup-body li {
-    margin-bottom: 6px;
+    margin-bottom: 0;
     list-style-type: none;
     position: relative;
+    padding-left: 14px;
 }
 
 .popup-body li:before {
-    content: "•";
-    color: #66c0f4;
+    content: "—";
+    color: rgba(255, 255, 255, 0.2);
     position: absolute;
-    left: -12px;
+    left: 0;
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+@keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 94, 94, 0.45); }
+    50%       { box-shadow: 0 0 0 6px rgba(255, 94, 94, 0); }
+}
+
+.popup-hide-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0;
+    padding: 7px 12px;
+    background: rgba(255, 94, 94, 0.1);
+    border: 1px solid rgba(255, 94, 94, 0.35);
+    border-radius: 4px;
+    color: #ff5e5e;
+    font-family: "Manrope", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-sizing: border-box;
+    animation: pulse-red 1.8s ease-in-out infinite;
+    transition: background 0.15s, color 0.15s;
+}
+
+.popup-hide-button:hover {
+    background: rgba(255, 94, 94, 0.22);
+    color: #ff8080;
 }
 
 /* Match cards */
