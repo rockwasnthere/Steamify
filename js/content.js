@@ -203,65 +203,28 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
 // Stats layout
 const statsLayout = () => {
     return `
-    <div class="page_content faceit_stats_content under_popup">
-        <table class="faceit_stats nonresponsive_hidden">
-            <thead>
-                <tr>
-                    <th class="faceit_col col_header">RESULT</th>
-                    <th class="faceit_col col_header">TEAM</th>
-                    <th class="faceit_col col_header">SCORE</th>
-                    <th class="faceit_col col_header">K-A-D</th>
-                    <th class="faceit_col col_header">K/D</th>
-                    <th class="faceit_col col_header">K/R</th>
-                    <th class="faceit_col col_header">HS</th>
-                    <th class="faceit_col col_header">ADR</th>
-                    <th class="faceit_col col_header">MAP</th>
-                    <th class="faceit_col col_header">DATE</th>
-                    <!--<th class="faceit_col col_header">ELO</th>-->
-                    <th class="faceit_col col_header"></th>
-                </tr>
-            </thead>
-            <tbody class="faceit_stats_tbody">
-            </tbody>
-        </table>
+    <div class="faceit_stats_content">
+        <div class="faceit_matches_list"></div>
     </div>`;
 }
 // Players layout
 const playersLayout = (matchID, team, player) => {
-    return $(`.${matchID}_team_${team}`).after(`
-        <tr data-id="${matchID}" class="nonresponsive_hidden faceit_row faceit_stats_details">
-            <td colspan=3 class="links">
-                <a class="text-primary" data-player_id="${player.player_id}"><span>[Steam]</span></a>
-                <a href="https://www.faceit.com/en/players/${player.nickname}" target="_blank" class="text-faceit"><span>${player.nickname}</span></a>
-            </td>
-            <td>
-                <span>${player.player_stats['Kills']}-${player.player_stats['Assists']}-${player.player_stats['Deaths']}</span>
-            </td>
-            <td>
-                <span class="stat_${(player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase'}">${player.player_stats['K/D Ratio']}</span>
-            </td>
-            <td>
-                <span class="stat_${(player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase'}">${player.player_stats['K/R Ratio']}</span>
-            </td>
-            <td>
-                <span>${player.player_stats['Headshots %']}% (${player.player_stats['Headshots']})</span>
-            </td>
-            <td>
-                <span>${player.player_stats['ADR']}</span>
-            </td>
-            <td>
-                <span class="${(player.player_stats['MVPs'] > 0) ? 'text-white' : ''}">${player.player_stats['MVPs']}</span>
-            </td>
-            <td>
-                <span class="${(player.player_stats['Triple Kills'] > 0) ? 'text-white' : ''}">${player.player_stats['Triple Kills']}</span>
-            </td>
-            <td>
-                <span class="${(player.player_stats['Quadro Kills'] > 0) ? 'text-white' : ''}">${player.player_stats['Quadro Kills']}</span>
-            </td>
-            <td>
-                <span class="${(player.player_stats['Penta Kills'] > 0) ? 'text-white' : ''}">${player.player_stats['Penta Kills']}</span>
-            </td>
-        </tr>`);
+    return $(`.${matchID}_team_${team}`).prepend(`
+        <div class="faceit_player_row">
+            <span class="faceit_player_name">
+                <a class="text-primary" data-player_id="${player.player_id}">[Steam]</a>
+                <a href="https://www.faceit.com/en/players/${player.nickname}" target="_blank" class="text-faceit">${player.nickname}</a>
+            </span>
+            <span class="faceit_player_stat">${player.player_stats['Kills']}-${player.player_stats['Assists']}-${player.player_stats['Deaths']}</span>
+            <span class="faceit_player_stat"><span class="stat_${(player.player_stats['K/D Ratio'] < 1) ? 'decrease' : 'increase'}">${player.player_stats['K/D Ratio']}</span></span>
+            <span class="faceit_player_stat"><span class="stat_${(player.player_stats['K/R Ratio'] < 1) ? 'decrease' : 'increase'}">${player.player_stats['K/R Ratio']}</span></span>
+            <span class="faceit_player_stat">${player.player_stats['Headshots %']}% (${player.player_stats['Headshots']})</span>
+            <span class="faceit_player_stat">${player.player_stats['ADR']}</span>
+            <span class="faceit_player_stat"><span class="${(player.player_stats['MVPs'] > 0) ? 'text-white' : ''}">${player.player_stats['MVPs']}</span></span>
+            <span class="faceit_player_stat"><span class="${(player.player_stats['Triple Kills'] > 0) ? 'text-white' : ''}">${player.player_stats['Triple Kills']}</span></span>
+            <span class="faceit_player_stat"><span class="${(player.player_stats['Quadro Kills'] > 0) ? 'text-white' : ''}">${player.player_stats['Quadro Kills']}</span></span>
+            <span class="faceit_player_stat"><span class="${(player.player_stats['Penta Kills'] > 0) ? 'text-white' : ''}">${player.player_stats['Penta Kills']}</span></span>
+        </div>`);
 }
 // Maps layout
 const mapsLayout = (map) => {
@@ -341,8 +304,7 @@ const getLastGames = () => {
                 });
             },
             complete: () => {
-                $('.faceit_stats_content').attr('style', 'margin-top: 32px !important');
-                $('.faceit_stats').show();
+                $('.faceit_stats_content').attr('style', 'margin-top: 8px !important');
                 $('.faceit_stats_load').text(`LOADING... [${loadingCounter - 1}]`);
 
                 if (loadingCounter === matchesList.length) {
@@ -375,107 +337,67 @@ const getLastGames = () => {
                         $('.lastKills').text(Math.round(calcAvg(Kills)));
 
                         if (match.leaver) {
-                            $('.faceit_stats_tbody').append(
-                                `<tr data-match-id="${matchID}" class="faceit_row faceit_stats_leaver">
-                                <td class="faceit_stats_td">
-                                    A
-                                </td>
-                                <td class="faceit_stats_td" colspan=10>
-                                    ABANDONED
-                                </td>
-                                <td>
-                                    <a href="https://faceit.com/en/cs2/room/${match.match.id}" target="_blank" class="filter_tag_button_ctn" data-tooltip-html="Check match on faceit">
-                                        <div class="btn_black btn_details btn_small">
-                                            <span>🔗</span>
-                                        </div>
-                                    </a>
-                                </td>
-                            </tr>`);
+                            $('.faceit_matches_list').append(
+                                `<div class="faceit_match_card faceit_stats_leaver" data-match-id="${matchID}">
+                                    <span class="faceit_match_result">A</span>
+                                    <span class="faceit_match_abandoned">ABANDONED</span>
+                                    <a href="https://faceit.com/en/cs2/room/${match.match.id}" target="_blank" class="faceit_match_link" data-tooltip-html="Check match on faceit">🔗</a>
+                                </div>`);
                         } else {
-                            $('.faceit_stats_tbody').append(`
-                            <tr data-match-id="${matchID}" class="faceit_row faceit_stats_${(is_winner) ? `win` : `lose`}">
-                                <td class="faceit_stats_td">
-                                    ${(is_winner) ? `<span class="stat_increase">W</span>` : `<span class="stat_decrease">L</span>`}
-                                </td>
-                                <td>
-                                    <span><a href="${match.faceit_url}" target="_blank" class="text-underline">${match.team_name}</a></span>
-                                </td>
-                                <td>
-                                    <span>${match.score}</span>
-                                </td>
-                                <td>
-                                    <span>${match.kills}-${match.assists}-${match.deaths}</span>
-                                </td>
-
-                                <td>
-                                    <span class="stat_${(match.kda < 1) ? 'decrease' : 'increase'}">${match.kda}</span>
-                                </td>
-                                <td>
-                                    <span class="stat_${(match.kr < 1) ? 'decrease' : 'increase'}">${match.kr}</span>
-                                </td>
-                                <td>
-                                    <span>${match.hs_percent}% (${match.hs})</span>
-                                </td>
-                                <td>
-                                    <span>${match.adr}</span>
-                                </td>
-                                <td>
-                                    <span>${match.map}</span>
-                                </td>
-                                <td colspan=2>
-                                    <span>${match.finished_at}</span>
-                                </td>
-                                <!--
-                                <td>
-                                    <span>
-                                        ${(match.elo === undefined) ?
-                                    `---` :
-                                    match.elo + ` <span class="stat_` +
-                                    (
-                                        (is_winner) ?
-                                            `increase">` :
-                                            `decrease">`
-                                    ) +
-                                    ((matchID === (matchesList.length - 1)) ? `` : (matchList[matchID + 1].elo === undefined) ?
-                                        `` : `(` +
-                                        (((match.elo - matchList[matchID + 1].elo) < 0) ?
-                                            match.elo - matchList[matchID + 1].elo :
-                                            `+` + (match.elo - matchList[matchID + 1].elo)) + `)</span>`)}
-                                    </span>
-                                </td>
-                                -->
-                                <td class="faceit_arrow">
-                                    <div class="filter_tag_button_ctn" data-tooltip-html="Check match details">
-                                        <div class="btn_black btn_details btn_small">
-                                            <span>
-                                                <span class="btn_details_arrow down"></span>
-                                            </span>
-                                        </div>
+                            $('.faceit_matches_list').append(`
+                            <div class="faceit_match_card faceit_stats_${(is_winner) ? 'win' : 'lose'}" data-match-id="${matchID}">
+                                <span class="faceit_match_result">${(is_winner) ? '<span class="stat_increase">W</span>' : '<span class="stat_decrease">L</span>'}</span>
+                                <span class="faceit_match_map">${match.map}</span>
+                                <span class="faceit_match_score">${match.score}</span>
+                                <span class="faceit_match_stat">${match.kills}-${match.assists}-${match.deaths}</span>
+                                <span class="faceit_match_stat"><span class="faceit_match_stat_label">K/D </span><span class="stat_${(match.kda < 1) ? 'decrease' : 'increase'}">${match.kda}</span></span>
+                                <span class="faceit_match_stat"><span class="faceit_match_stat_label">K/R </span><span class="stat_${(match.kr < 1) ? 'decrease' : 'increase'}">${match.kr}</span></span>
+                                <span class="faceit_match_stat"><span class="faceit_match_stat_label">HS </span>${match.hs_percent}%</span>
+                                <span class="faceit_match_stat"><span class="faceit_match_stat_label">ADR </span>${match.adr}</span>
+                                <span class="faceit_match_date">${match.finished_at}</span>
+                                <a href="${match.faceit_url}" target="_blank" class="faceit_match_link" data-tooltip-html="View on FACEIT">🔗</a>
+                                <span class="faceit_match_expand" data-tooltip-html="Match details">▾</span>
+                            </div>
+                            <div class="faceit_match_details" data-id="${matchID}" style="display:none">
+                                <div class="faceit_team_section">
+                                    <div class="faceit_team_header">
+                                        <span class="stat_${(winner_id === 'faction1') ? 'increase' : 'decrease'}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
+                                        <span>FINAL SCORE: <span class="text-white">${team_A.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_A.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_A.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_A.team_stats['Overtime score']}</span>)</span></span>
                                     </div>
-                                </td>
-                            </tr>
-                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
-                                <th colspan=8>
-                                    <span class="stat_${(winner_id === 'faction1') ? `increase` : `decrease`}">${team_A.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
-                                </th>
-                                <th colspan=4>
-                                    <span>
-                                        FINAL SCORE: <span class="text-white">${team_A.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_A.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_A.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_A.team_stats['Overtime score']}</span>)
-                                    </span>
-                                </th>
-                            </tr>
-                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_A">${ELEMENT_STATS_HEADER}</tr>
-                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header">
-                                <th colspan=8>
-                                    <span class="stat_${(winner_id === 'faction2') ? `increase` : `decrease`}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
-                                </th>
-                                <th colspan=4>
-                                    <span>
-                                        FINAL SCORE: <span class="text-white">${team_B.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_B.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_B.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_B.team_stats['Overtime score']}</span>)
-                                    </span>
-                                </th>
-                            </tr>
-                            <tr data-id="${matchID}" class="nonresponsive_hidden faceit_stats_details_header ${matchID}_team_B">${ELEMENT_STATS_HEADER}</tr>`);
+                                    <div class="faceit_team_columns">
+                                        <span class="faceit_player_name_col">PLAYER</span>
+                                        <span class="faceit_player_stat_col">K-A-D</span>
+                                        <span class="faceit_player_stat_col">K/D</span>
+                                        <span class="faceit_player_stat_col">K/R</span>
+                                        <span class="faceit_player_stat_col">HS</span>
+                                        <span class="faceit_player_stat_col">ADR</span>
+                                        <span class="faceit_player_stat_col">MVPs</span>
+                                        <span class="faceit_player_stat_col">3K</span>
+                                        <span class="faceit_player_stat_col">4K</span>
+                                        <span class="faceit_player_stat_col">5K</span>
+                                    </div>
+                                    <div class="${matchID}_team_A faceit_team_players"></div>
+                                </div>
+                                <div class="faceit_team_section">
+                                    <div class="faceit_team_header">
+                                        <span class="stat_${(winner_id === 'faction2') ? 'increase' : 'decrease'}">${team_B.team_stats['Team'].toUpperCase()} SCOREBOARD</span>
+                                        <span>FINAL SCORE: <span class="text-white">${team_B.team_stats['Final Score']} <span data-tooltip-html="FIRST HALF">(${team_B.team_stats['First Half Score']}</span>:<span data-tooltip-html="SECOND HALF">${team_B.team_stats['Second Half Score']}</span> | <span data-tooltip-html="OVERTIME">${team_B.team_stats['Overtime score']}</span>)</span></span>
+                                    </div>
+                                    <div class="faceit_team_columns">
+                                        <span class="faceit_player_name_col">PLAYER</span>
+                                        <span class="faceit_player_stat_col">K-A-D</span>
+                                        <span class="faceit_player_stat_col">K/D</span>
+                                        <span class="faceit_player_stat_col">K/R</span>
+                                        <span class="faceit_player_stat_col">HS</span>
+                                        <span class="faceit_player_stat_col">ADR</span>
+                                        <span class="faceit_player_stat_col">MVPs</span>
+                                        <span class="faceit_player_stat_col">3K</span>
+                                        <span class="faceit_player_stat_col">4K</span>
+                                        <span class="faceit_player_stat_col">5K</span>
+                                    </div>
+                                    <div class="${matchID}_team_B faceit_team_players"></div>
+                                </div>
+                            </div>`);
 
                             addTeam(team_A, matchID, 'A');
                             addTeam(team_B, matchID, 'B');
@@ -766,14 +688,20 @@ $('body')
     );
 // Get last 30 games when click on button
 $(document).on('click', '.faceit_stats_load', () => {
-    if (!$(".faceit_row")[0]) {
+    if (!$(".faceit_match_card")[0]) {
         getLastGames();
+    } else {
+        $('.faceit_matches_list').toggle();
+        $('.faceit_stats_content').css('margin-top', $('.faceit_matches_list').is(':visible') ? '8px' : '0');
     }
 });
 // Open match details
-$(document).on('click', '.filter_tag_button_ctn', (e) => {
-    $(e.currentTarget).find('.btn_details_arrow').toggleClass('down up');
-    $(`tr[data-id=${$(e.currentTarget).parents('.faceit_row').data('match-id')}]`).toggle();
+$(document).on('click', '.faceit_match_card:not(.faceit_stats_leaver)', (e) => {
+    if ($(e.target).closest('a').length) return;
+    const card = $(e.currentTarget);
+    const arrow = card.find('.faceit_match_expand');
+    arrow.text(arrow.text().trim() === '▾' ? '▴' : '▾');
+    $(`.faceit_match_details[data-id="${card.data('match-id')}"]`).toggle();
 });
 // Open player steam profile
 $(document).on('click', '.text-primary', (e) => {

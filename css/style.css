@@ -377,13 +377,7 @@
 
 .game_info_faceit_header {
     text-align: center;
-    background-color: #3F51B5;
     text-transform: uppercase;
-    font-weight: bold;
-    color: #fff;
-    position: absolute;
-    left: 0;
-    width: 100%;
 }
 
 .game_info_achievements_only_ctn {
@@ -392,9 +386,21 @@
 
 .faceit_stats_load {
     cursor: pointer;
-    color: #000;
+    font-size: 11px;
+    color: #fff;
+    background: rgba(255, 85, 0, 0.15);
+    border: 1px solid rgba(255, 85, 0, 0.4);
+    border-radius: 4px;
+    padding: 4px 10px;
+    transition: all 0.2s;
     margin-top: 8px;
-    background-color: #ff9800;
+    text-align: center;
+    font-weight: bold;
+}
+
+.faceit_stats_load:hover {
+    background: rgba(255, 85, 0, 0.3);
+    border-color: rgba(255, 85, 0, 0.6);
 }
 
 .faceit_stats_td {
@@ -456,7 +462,7 @@
 }
 
 .faceit_stats_content {
-    margin-top: 18px !important;
+    margin-top: 0 !important;
     width: 100% !important;
 }
 
@@ -597,4 +603,187 @@
     color: #66c0f4;
     position: absolute;
     left: -12px;
+}
+
+/* Match cards */
+.faceit_matches_list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.faceit_match_card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #9099a1;
+    transition: border-color 0.15s;
+}
+
+.faceit_match_card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.faceit_match_card.faceit_stats_win:hover {
+    background-color: rgba(42, 94, 42, 0.65);
+}
+
+.faceit_match_card.faceit_stats_lose:hover {
+    background-color: rgba(94, 42, 42, 0.65);
+}
+
+.faceit_match_card.faceit_stats_leaver:hover {
+    background-color: rgba(128, 128, 128, 0.65);
+}
+
+.faceit_match_result {
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.faceit_match_map {
+    color: #fff;
+    width: 80px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.faceit_match_score {
+    width: 40px;
+    flex-shrink: 0;
+}
+
+.faceit_match_score a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.faceit_match_score a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.faceit_match_stat {
+    width: 55px;
+    flex-shrink: 0;
+}
+
+.faceit_match_stat_label {
+    color: #808080;
+}
+
+.faceit_match_date {
+    color: #808080;
+    flex: 1;
+    text-align: right;
+}
+
+.faceit_match_expand {
+    flex-shrink: 0;
+    color: #808080;
+    font-size: 10px;
+}
+
+.faceit_match_abandoned {
+    flex: 1;
+}
+
+.faceit_match_link {
+    text-decoration: none;
+    font-size: 11px;
+    color: #808080;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 1px 6px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.faceit_match_link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.faceit_match_details {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.faceit_team_section {
+    margin-bottom: 2px;
+}
+
+.faceit_team_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 10px;
+    background-color: rgba(0, 0, 0, 0.48);
+    font-size: 11px;
+    font-weight: bold;
+    color: #9099a1;
+}
+
+.faceit_team_columns {
+    display: flex;
+    padding: 2px 10px;
+    font-size: 10px;
+    color: #808080;
+    background-color: rgba(0, 0, 0, 0.25);
+    text-transform: uppercase;
+}
+
+.faceit_player_name_col {
+    flex: 1;
+}
+
+.faceit_player_stat_col {
+    width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.faceit_team_players {
+    display: flex;
+    flex-direction: column;
+}
+
+.faceit_player_row {
+    display: flex;
+    align-items: center;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: #9099a1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.faceit_player_row:hover {
+    background-color: rgba(42, 72, 94, 0.4);
+    color: #fff;
+}
+
+.faceit_player_name {
+    flex: 1;
+    display: flex;
+    gap: 6px;
+}
+
+.faceit_player_stat {
+    width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+    font-weight: bold;
 }
