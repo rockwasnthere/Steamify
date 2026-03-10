@@ -753,6 +753,88 @@
     flex-shrink: 0;
 }
 
+.faceit_match_elo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    width: 44px;
+    text-align: center;
+    flex-shrink: 0;
+    letter-spacing: 0.2px;
+    line-height: 1.3;
+}
+.faceit_elo_val {
+    font-size: 9px;
+    font-weight: 600;
+    opacity: 0.5;
+}
+
+.faceit_elo_total {
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.85;
+}
+.faceit_squad_section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+.faceit_squad_label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.6px;
+    flex-shrink: 0;
+    margin-right: 2px;
+}
+.faceit_squad_player {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 2px 7px;
+    text-decoration: none !important;
+    transition: background 0.1s ease;
+}
+.faceit_squad_player:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.faceit_squad_level {
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    opacity: 0.9;
+}
+.faceit_squad_name {
+    color: #ff5500;
+    font-size: 11px;
+    font-weight: 600;
+}
+.faceit_squad_elo {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 10px;
+    font-weight: 700;
+}
+.faceit_squad_stat {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+}
+
 .faceit_match_map {
     color: #fff;
     width: 80px;
@@ -877,6 +959,39 @@
 .faceit_player_row:hover {
     background-color: rgba(42, 72, 94, 0.4);
     color: #fff;
+}
+.faceit_player_self {
+    background-color: rgba(255, 85, 0, 0.08) !important;
+    border-left: 2px solid #ff5500 !important;
+    padding-left: 8px !important;
+}
+.faceit_player_self:hover {
+    background-color: rgba(255, 85, 0, 0.16) !important;
+}
+.faceit_player_party {
+    background-color: rgba(var(--pcolor), 0.08) !important;
+    transition: transform 0.12s ease, background-color 0.12s ease;
+}
+.faceit_player_party:hover {
+    background-color: rgba(var(--pcolor), 0.14) !important;
+}
+.faceit_party_hover {
+    transform: translate(2px, -2px);
+}
+.faceit_player_party .faceit_player_name::before {
+    content: '▶';
+    color: rgba(var(--pcolor), 0.85);
+    font-size: 8px;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+/* Self + party: keep orange bg/border, only add the green arrow */
+.faceit_player_self.faceit_player_party {
+    background-color: rgba(255, 85, 0, 0.08) !important;
+    border-left: 2px solid #ff5500 !important;
+}
+.faceit_player_self.faceit_player_party:hover {
+    background-color: rgba(255, 85, 0, 0.16) !important;
 }
 
 .faceit_player_name {

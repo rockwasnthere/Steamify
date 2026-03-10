@@ -210,7 +210,7 @@ const statsLayout = () => {
 // Players layout
 const playersLayout = (matchID, team, player) => {
     return $(`.${matchID}_team_${team}`).prepend(`
-        <div class="faceit_player_row">
+        <div class="faceit_player_row${player.player_id === faceitPlayerID ? ' faceit_player_self' : ''}">
             <span class="faceit_player_name">
                 <a class="text-primary" data-player_id="${player.player_id}">[Steam]</a>
                 <a href="https://www.faceit.com/en/players/${player.nickname}" target="_blank" class="text-faceit">${player.nickname}</a>
@@ -238,6 +238,120 @@ const mapsLayout = (map) => {
             .append($('<span>', { class: "faceit_map_stat" }).append($('<span>', { class: "faceit_map_stat_label", text: "ADR " })).append($('<span>', { class: "text-white", text: (map.stats['ADR'] ?? 0) })))
         );
 }
+// Safe wrapper — silently ignores "Extension context invalidated" after reloads
+const sendMessage = (msg, cb) => { try { chrome.runtime.sendMessage(msg, cb); } catch (e) {} };
+
+// Promise wrapper for sendMessage — resolves null on error/context invalidated
+const fetchUrl = (url) => new Promise(resolve => {
+    try {
+        chrome.runtime.sendMessage({ type: 'fetchUrl', url }, response =>
+            resolve(chrome.runtime.lastError ? null : (response ?? null))
+        );
+    } catch (e) { resolve(null); }
+});
+
+// Aggregate party mate stats across all 30 matches and render squad summary
+const loadPartyStats = async () => {
+    const limit = matchesList.length === 31 ? 30 : matchesList.length;
+
+    // Build nickname map from already-loaded team data
+    const nicknameMap = {};
+    for (let i = 0; i < limit; i++) {
+        const teams = matchList[i]?.match?.teams?.[0];
+        if (!teams) continue;
+        [0, 1].forEach(t => teams[t]?.players?.forEach(p => { nicknameMap[p.player_id] = p.nickname; }));
+    }
+
+    // Fetch party data for all matches in parallel
+    const responses = await Promise.all(
+        Array.from({ length: limit }, (_, i) => {
+            const id = matchList[i]?.match?.id;
+            return id ? fetchUrl(`https://api.faceit.com/match/v2/match/${id}`) : Promise.resolve(null);
+        })
+    );
+
+    // Accumulate per-player stats
+    const squadStats = {};
+    responses.forEach((response, i) => {
+        if (!response?.success) return;
+        const parties = response.data?.payload?.parties;
+        if (!parties?.length) return;
+        const myParty = parties.find(p => p.users.includes(faceitPlayerID) && p.users.length > 1);
+        if (!myParty) return;
+        const isWin = matchList[i]?.match?.winner === 1;
+        myParty.users.forEach(playerId => {
+            if (playerId === faceitPlayerID) return;
+            if (!squadStats[playerId]) squadStats[playerId] = { nickname: nicknameMap[playerId] || '?', games: 0, wins: 0 };
+            squadStats[playerId].games++;
+            if (isWin) squadStats[playerId].wins++;
+        });
+    });
+
+    const sorted = Object.entries(squadStats).sort((a, b) => b[1].games - a[1].games).slice(0, 5);
+    if (!sorted.length) return;
+
+    // Fetch ELO + level for each squad member via Open API (Bearer already set in $.ajaxSetup)
+    const playerData = await Promise.all(sorted.map(([id]) => new Promise(resolve => {
+        $.getJSON({
+            url: `${API_URL}/players/${id}`,
+            success: data => resolve({
+                elo: data?.games?.cs2?.faceit_elo ?? null,
+                level: data?.games?.cs2?.skill_level ?? null
+            }),
+            error: () => resolve({ elo: null, level: null })
+        });
+    })));
+
+    const items = sorted.map(([, s], idx) => {
+        const wr = Math.round((s.wins / s.games) * 100);
+        const cls = wr >= 50 ? 'stat_increase' : 'stat_decrease';
+        const { elo, level } = playerData[idx];
+        const levelHtml = level
+            ? `<span class="faceit_squad_level" style="color:${getLevelColor(level)}">${level}</span>`
+            : '';
+        const eloHtml = elo ? `<span class="faceit_squad_elo">${elo}</span>` : '';
+        return `<a href="https://www.faceit.com/en/players/${s.nickname}" target="_blank" class="faceit_squad_player">
+            ${levelHtml}
+            <span class="faceit_squad_name">${s.nickname}</span>
+            ${eloHtml}
+            <span class="faceit_squad_stat">${s.games}G <span class="${cls}">${wr}%</span></span>
+        </a>`;
+    }).join('');
+
+    $('.faceit_stats_content').prepend(
+        `<div class="faceit_squad_section"><span class="faceit_squad_label">SQUAD</span>${items}</div>`
+    );
+};
+
+// Load ELO change per match from FACEIT stats API (via background worker to bypass CORS)
+const loadEloHistory = () => {
+    sendMessage({
+        type: 'fetchUrl',
+        url: `https://api.faceit.com/stats/v1/stats/time/users/${faceitPlayerID}/games/cs2?page=0&size=31`
+    }, response => {
+        if (chrome.runtime.lastError || !response?.success) return;
+        // API returns the array directly (no payload wrapper)
+        const history = Array.isArray(response.data) ? response.data : response.data?.payload;
+        if (!history?.length) return;
+
+        // Per-match ELO change using elo_delta field, matched by index
+        history.forEach((item, i) => {
+            const delta = parseInt(item.elo_delta);
+            if (isNaN(delta)) return;
+            const sign = delta > 0 ? '+' : '';
+            const cls = delta >= 0 ? 'stat_increase' : 'stat_decrease';
+            $('.faceit_match_card').eq(i).find('.faceit_match_elo')
+                .html(`<span class="faceit_elo_val">${item.elo}</span><span class="${cls}">${sign}${delta}</span>`);
+        });
+
+        // Total ELO change over rendered matches only (not the sentinel 31st)
+        const total = history.slice(0, $('.faceit_match_card').length).reduce((sum, item) => sum + (parseInt(item.elo_delta) || 0), 0);
+        const sign = total > 0 ? '+' : '';
+        const cls = total >= 0 ? 'stat_increase' : 'stat_decrease';
+        $('.faceit_stats_load').append(` <span class="faceit_elo_total ${cls}">(${sign}${total} ELO)</span>`);
+    });
+};
+
 // Get 30 last games
 const getLastGames = () => {
 
@@ -347,6 +461,7 @@ const getLastGames = () => {
                             $('.faceit_matches_list').append(`
                             <div class="faceit_match_card faceit_stats_${(is_winner) ? 'win' : 'lose'}" data-match-id="${matchID}">
                                 <span class="faceit_match_result">${(is_winner) ? '<span class="stat_increase">W</span>' : '<span class="stat_decrease">L</span>'}</span>
+                                <span class="faceit_match_elo" data-match-faceit-id="${match.match.id}"></span>
                                 <span class="faceit_match_map">${match.map}</span>
                                 <span class="faceit_match_score">${match.score}</span>
                                 <span class="faceit_match_stat">${match.kills}-${match.assists}-${match.deaths}</span>
@@ -403,6 +518,8 @@ const getLastGames = () => {
                             addTeam(team_B, matchID, 'B');
                         }
                     });
+                    loadEloHistory();
+                    loadPartyStats();
                 } else {
                     loadingCounter++;
                 }
@@ -714,16 +831,62 @@ $(document).on('click', '.faceit_stats_load', () => {
         getLastGames();
     } else {
         $('.faceit_matches_list').toggle();
-        $('.faceit_stats_content').css('margin-top', $('.faceit_matches_list').is(':visible') ? '8px' : '0');
+        $('.faceit_stats_content').attr('style', `margin-top: ${$('.faceit_matches_list').is(':visible') ? '8px' : '0'} !important`);
     }
 });
 // Open match details
 $(document).on('click', '.faceit_match_card:not(.faceit_stats_leaver)', (e) => {
     if ($(e.target).closest('a').length) return;
     const card = $(e.currentTarget);
+    const matchID = card.data('match-id');
     const arrow = card.find('.faceit_match_expand');
+    const details = $(`.faceit_match_details[data-id="${matchID}"]`);
+
     arrow.text(arrow.text().trim() === '▾' ? '▴' : '▾');
-    $(`.faceit_match_details[data-id="${card.data('match-id')}"]`).toggle();
+    details.toggle();
+
+    // Load party data once on first expand
+    if (details.is(':visible') && !details.data('parties-loaded')) {
+        details.data('parties-loaded', true);
+        const faceitMatchId = matchList[matchID]?.match?.id;
+        if (!faceitMatchId) return;
+        sendMessage({
+            type: 'fetchUrl',
+            url: `https://api.faceit.com/match/v2/match/${faceitMatchId}`
+        }, response => {
+            if (!response?.success) return;
+            // parties = [{ partyId, users: [playerId, ...] }, ...]
+            const parties = response.data?.payload?.parties;
+            if (!parties?.length) return;
+            const OTHER_COLORS = ['80,140,255', '180,80,255', '255,200,50', '50,200,220'];
+            // Ally party (contains current player) gets green, enemy parties cycle through other colors
+            const myPartyId = parties.find(p => p.users.includes(faceitPlayerID))?.partyId;
+            let otherIdx = 0;
+            parties.forEach(party => {
+                if (party.users.length < 2) return;
+                const color = party.partyId === myPartyId
+                    ? '80,200,120'
+                    : OTHER_COLORS[otherIdx++ % OTHER_COLORS.length];
+                party.users.forEach(playerId => {
+                    const $row = details.find(`a[data-player_id="${playerId}"]`).closest('.faceit_player_row');
+                    if (!$row.length) return;
+                    $row.addClass('faceit_player_party').css('--pcolor', color).attr('data-party-color', color);
+                });
+            });
+        });
+    }
+});
+// Party hover — shift all members of the same party together
+$(document).on('mouseenter', '.faceit_player_party', function () {
+    const color = $(this).attr('data-party-color');
+    $(this).closest('.faceit_match_details')
+        .find(`.faceit_player_party[data-party-color="${color}"]`)
+        .addClass('faceit_party_hover');
+}).on('mouseleave', '.faceit_player_party', function () {
+    const color = $(this).attr('data-party-color');
+    $(this).closest('.faceit_match_details')
+        .find(`.faceit_player_party[data-party-color="${color}"]`)
+        .removeClass('faceit_party_hover');
 });
 // Open player steam profile
 $(document).on('click', '.text-primary', (e) => {
