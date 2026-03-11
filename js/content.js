@@ -886,6 +886,9 @@ if (!$(".faceit_maps")[0]) {
 
                                             window._faceit_segments = segments;
                                             getMapsStats(segments);
+                                            $('.showcase_faceit, .game_info_stats, .faceit_stats_content').hide();
+                                            $('.faceit_level_banner').addClass('faceit_stats_collapsed');
+                                            $('.showcase_faceit_content').addClass('faceit_stats_collapsed_wrap');
 
                                             // Check if maps played length equals to MapsVeto length to center them
                                             if ($('.faceit_maps > *').length < MAPS_VETO.length) {
@@ -903,6 +906,7 @@ if (!$(".faceit_maps")[0]) {
                                                 comparedSteamID = myID;
                                                 $('.faceit_level_banner_content').append('<button class="faceit_compare_btn">⚖ Compare</button>');
                                             }
+                                            $('.faceit_level_banner_content').append('<button class="faceit_compare_btn faceit_details_btn">▴ Stats</button>');
                                         },
                                         complete: () => {
                                             $('.faceit_content').css('display', 'flex');
@@ -1057,8 +1061,16 @@ $(document).on('change', '.faceit_maps_option input', function () {
     $('.faceit_maps').empty();
     if (window._faceit_segments) getMapsStats(window._faceit_segments);
 });
+// Details button — toggle detailed stats visibility
+$(document).on('click', '.faceit_details_btn', function () {
+    const visible = $('.showcase_faceit').is(':visible');
+    $('.showcase_faceit, .game_info_stats, .faceit_stats_content').toggle();
+    $('.faceit_level_banner').toggleClass('faceit_stats_collapsed', visible);
+    $('.showcase_faceit_content').toggleClass('faceit_stats_collapsed_wrap', visible);
+    $(this).text(visible ? '▴ Stats' : '▾ Stats');
+});
 // Compare button — fetch logged-in user's stats and show comparison modal
-$(document).on('click', '.faceit_compare_btn', async function () {
+$(document).on('click', '.faceit_compare_btn:not(.faceit_details_btn)', async function () {
     if ($('.faceit_compare_overlay').length) return;
     const $btn = $(this);
     const showModal = (myProfile, myElo, myLevel, myStats) => {

@@ -209,6 +209,8 @@
 .faceit_level_info {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-width: 0;
 }
 
 .faceit_level_elo {
@@ -1009,7 +1011,6 @@
 
 /* Compare button */
 .faceit_compare_btn {
-    margin-left: auto;
     cursor: pointer;
     font-size: 11px;
     color: #fff;
@@ -1026,6 +1027,14 @@
 .faceit_compare_btn:hover {
     background: rgba(255, 255, 255, 0.16);
     border-color: rgba(255, 255, 255, 0.3);
+}
+
+.faceit_level_banner.faceit_stats_collapsed {
+    margin-bottom: 0;
+}
+
+.faceit_stats_collapsed_wrap {
+    margin-bottom: 0 !important;
 }
 
 /* Compare modal */
