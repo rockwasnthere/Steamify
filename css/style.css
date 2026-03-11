@@ -1006,3 +1006,312 @@
     flex-shrink: 0;
     font-weight: bold;
 }
+
+/* Compare button */
+.faceit_compare_btn {
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 11px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+    padding: 4px 10px;
+    transition: all 0.2s;
+    font-weight: bold;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.faceit_compare_btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Compare modal */
+.faceit_compare_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 100001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.faceit_compare_modal {
+    background: #1b2838;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    width: 400px;
+    max-width: 90vw;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    font-family: "Motiva Sans", Arial, sans-serif;
+    font-size: 12px;
+}
+
+.faceit_cmp_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 10px;
+    font-weight: 700;
+    color: #9099a1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.faceit_cmp_close {
+    cursor: pointer;
+    color: #9099a1;
+    font-size: 14px;
+    transition: color 0.15s;
+    line-height: 1;
+}
+
+.faceit_cmp_close:hover {
+    color: #fff;
+}
+
+.faceit_cmp_players {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.faceit_cmp_player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.faceit_cmp_player.faceit_cmp_b {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+.faceit_cmp_level_icon {
+    flex-shrink: 0;
+    display: block;
+}
+
+.faceit_cmp_level_img {
+    width: 28px;
+    height: 28px;
+}
+
+.faceit_cmp_player_info {
+    min-width: 0;
+}
+
+.faceit_cmp_name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.faceit_cmp_name a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.faceit_cmp_name a:hover {
+    color: #ff5500;
+}
+
+.faceit_cmp_elo {
+    font-size: 10px;
+    color: #9099a1;
+    margin-top: 1px;
+}
+
+.faceit_cmp_vs {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.faceit_cmp_rows {
+    padding: 4px 0;
+}
+
+.faceit_cmp_row {
+    display: flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.faceit_cmp_row:last-child {
+    border-bottom: none;
+}
+
+.faceit_cmp_val {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: #9099a1;
+}
+
+.faceit_cmp_val_r {
+    text-align: right;
+}
+
+.faceit_cmp_label {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    width: 90px;
+    flex-shrink: 0;
+}
+
+.faceit_cmp_win {
+    color: #8bc34a !important;
+}
+
+.faceit_cmp_lose {
+    color: #ff5500 !important;
+}
+
+/* Map comparison section */
+.faceit_compare_modal {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.faceit_cmp_section_hdr {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    padding: 8px 14px 4px;
+}
+
+.faceit_cmp_maps_section {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 4px;
+}
+
+.faceit_cmp_map_row {
+    display: flex;
+    align-items: center;
+    padding: 5px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
+.faceit_cmp_map_row:last-child {
+    border-bottom: none;
+}
+
+.faceit_cmp_map_row_bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+}
+
+.faceit_cmp_map_side {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.faceit_cmp_map_side_b {
+    justify-content: flex-end;
+}
+
+.faceit_cmp_map_name {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    width: 72px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.faceit_cmp_map_wr {
+    font-size: 12px;
+    font-weight: 700;
+    color: #9099a1;
+}
+
+.faceit_cmp_map_kd {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.faceit_cmp_map_adr {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.faceit_cmp_map_matches {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.3);
+    min-width: 18px;
+    text-align: center;
+}
+
+.faceit_cmp_elo_diff {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.faceit_cmp_elo_diff_val {
+    color: rgba(255, 255, 255, 0.4);
+    min-width: 60px;
+    font-size: 11px;
+}
+
+.faceit_cmp_elo_diff_val_r {
+    text-align: right;
+}
+
+.faceit_cmp_elo_diff_main {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+
+.faceit_cmp_elo_diff_main.faceit_cmp_win {
+    text-shadow: 0 0 8px #8bc34a, 0 0 16px #8bc34a66;
+}
+
+.faceit_cmp_elo_diff_main.faceit_cmp_lose {
+    text-shadow: 0 0 8px #ff5500, 0 0 16px #ff550066;
+}

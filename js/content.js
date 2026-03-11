@@ -95,7 +95,10 @@ let matchesLimit = 31,
     matchesList,
     faceitPlayerID,
     matchList = [],
-    lastHS = lastKD = '?';
+    lastHS = lastKD = '?',
+    viewedPlayerStore = null,
+    comparedSteamID = null,
+    myCompareCache = null;
 
 // Ajax setup headers
 $.ajaxSetup({
@@ -145,7 +148,7 @@ const showcaseLayout = (lifetime, profile, elo, level, win, lose, lastHS, lastKD
                                 <a class="text-white" target="_blank" href="https://faceit.com/en/players/${profile.nickname}">${profile.nickname}</a>
                                 ${verified ? ELEMENT_VERIFIED : ''}
                             </div>
-                            <div class="faceit_level_sub"><span class="faceit_level_elo">${elo} ELO</span> · <span class="faceit_level_membership">${profile.memberships[0]}</span>${registeredDate ? ` · <span class="faceit_level_registered" data-tooltip-html="Registered on FACEIT">since ${registeredDate}</span>` : ''}</div>
+                            <div class="faceit_level_sub"><span class="faceit_level_elo">${elo} ELO</span> · <span class="faceit_level_membership" data-tooltip-html="FACEIT membership">${profile.memberships[0]}</span>${registeredDate ? ` · <span class="faceit_level_registered" data-tooltip-html="Registered on FACEIT">since ${registeredDate}</span>` : ''}</div>
                         </div>
                     </div>
                 </div>
@@ -238,6 +241,115 @@ const mapsLayout = (map) => {
             .append($('<span>', { class: "faceit_map_stat" }).append($('<span>', { class: "faceit_map_stat_label", text: "ADR " })).append($('<span>', { class: "text-white", text: (map.stats['ADR'] ?? 0) })))
         );
 }
+// Compare modal layout
+const compareModalLayout = (profData, profElo, profLevel, profLifetime, myData, myElo, myLevel, myLifetime, profSegments, mySegments) => {
+    const cmpRow = (label, aVal, bVal, higherIsBetter = true) => {
+        const a = parseFloat(aVal), b = parseFloat(bVal);
+        const aBetter = !isNaN(a) && !isNaN(b) && (higherIsBetter ? a > b : a < b);
+        const bBetter = !isNaN(a) && !isNaN(b) && (higherIsBetter ? b > a : b < a);
+        return `<div class="faceit_cmp_row">
+            <span class="faceit_cmp_val ${aBetter ? 'faceit_cmp_win' : bBetter ? 'faceit_cmp_lose' : ''}">${aVal}</span>
+            <span class="faceit_cmp_label">${label}</span>
+            <span class="faceit_cmp_val faceit_cmp_val_r ${bBetter ? 'faceit_cmp_win' : aBetter ? 'faceit_cmp_lose' : ''}">${bVal}</span>
+        </div>`;
+    };
+    const playerHdr = (d, elo, level, side) => {
+        const gc = getLevelColor(level);
+        return `<div class="faceit_cmp_player faceit_cmp_${side}">
+            <a href="https://faceit.com/en/players/${d.nickname}" target="_blank" class="faceit_cmp_level_icon" style="filter:drop-shadow(0 0 6px ${gc})">
+                <img src="${chrome.runtime.getURL(`images/lvl_${level}.svg`)}" class="faceit_cmp_level_img">
+            </a>
+            <div class="faceit_cmp_player_info">
+                <div class="faceit_cmp_name"><a href="https://faceit.com/en/players/${d.nickname}" target="_blank">${d.nickname}</a></div>
+            </div>
+        </div>`;
+    };
+    const pEloNum = parseInt(profElo) || 0;
+    const mEloNum = parseInt(myElo) || 0;
+    const eloDiff = pEloNum - mEloNum;
+    const eloDiffAbs = Math.abs(eloDiff);
+    const eloDiffClass = eloDiff > 0 ? 'faceit_cmp_lose' : eloDiff < 0 ? 'faceit_cmp_win' : '';
+    const eloDiffStr = eloDiffAbs > 0
+        ? (eloDiff > 0 ? `◄ ${eloDiffAbs} ELO ahead` : `${eloDiffAbs} ELO ahead ►`)
+        : 'Equal ELO';
+
+    const pWR = (profLifetime['Win Rate %'] ?? '—') + '%';
+    const mWR = (myLifetime['Win Rate %'] ?? '—') + '%';
+    const pKD = profLifetime['Average K/D Ratio'] ?? '—';
+    const mKD = myLifetime['Average K/D Ratio'] ?? '—';
+    const pHS = (profLifetime['Average Headshots %'] ?? '—') + '%';
+    const mHS = (myLifetime['Average Headshots %'] ?? '—') + '%';
+    const pADR = profLifetime['ADR'] ?? '—';
+    const mADR = myLifetime['ADR'] ?? '—';
+    const pM = profLifetime['Matches'] ?? '—';
+    const mM = myLifetime['Matches'] ?? '—';
+    const pWS = profLifetime['Longest Win Streak'] ?? '—';
+    const mWS = myLifetime['Longest Win Streak'] ?? '—';
+
+    // Build map index keyed by label for each player
+    const profMapIdx = {};
+    (profSegments || []).filter(filterMaps).forEach(s => { profMapIdx[s.label] = s; });
+    const myMapIdx = {};
+    (mySegments || []).filter(filterMaps).forEach(s => { myMapIdx[s.label] = s; });
+    const commonMaps = ALL_MAPS.filter(m => profMapIdx[m] && myMapIdx[m]);
+
+    const mapSection = commonMaps.length ? `
+        <div class="faceit_cmp_maps_section">
+            <div class="faceit_cmp_section_hdr">MAP STATS</div>
+            ${commonMaps.map(mapName => {
+                const pS = profMapIdx[mapName].stats;
+                const mS = myMapIdx[mapName].stats;
+                const pwr = parseFloat(pS['Win Rate %']), mwr = parseFloat(mS['Win Rate %']);
+                const pkd = parseFloat(pS['Average K/D Ratio']), mkd = parseFloat(mS['Average K/D Ratio']);
+                const padr = parseFloat(pS['ADR'] ?? 0), madr = parseFloat(mS['ADR'] ?? 0);
+                const pWRBetter = pwr > mwr, mWRBetter = mwr > pwr;
+                return `<div class="faceit_cmp_map_row" style="background-image:url(${profMapIdx[mapName].img_small})">
+                    <div class="faceit_cmp_map_row_bg"></div>
+                    <div class="faceit_cmp_map_side faceit_cmp_map_side_a">
+                        <span class="faceit_cmp_map_matches">${pS['Matches']}</span>
+                        <span class="faceit_cmp_map_wr ${pWRBetter ? 'faceit_cmp_win' : mWRBetter ? 'faceit_cmp_lose' : ''}">${pS['Win Rate %']}%</span>
+                        <span class="faceit_cmp_map_kd ${pkd >= 1 ? 'stat_increase' : 'stat_decrease'}">${pS['Average K/D Ratio']}</span>
+                        <span class="faceit_cmp_map_adr">${pS['ADR'] ?? '—'}</span>
+                    </div>
+                    <div class="faceit_cmp_map_name">${mapName}</div>
+                    <div class="faceit_cmp_map_side faceit_cmp_map_side_b">
+                        <span class="faceit_cmp_map_adr">${mS['ADR'] ?? '—'}</span>
+                        <span class="faceit_cmp_map_kd ${mkd >= 1 ? 'stat_increase' : 'stat_decrease'}">${mS['Average K/D Ratio']}</span>
+                        <span class="faceit_cmp_map_wr ${mWRBetter ? 'faceit_cmp_win' : pWRBetter ? 'faceit_cmp_lose' : ''}">${mS['Win Rate %']}%</span>
+                        <span class="faceit_cmp_map_matches">${mS['Matches']}</span>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>` : '';
+
+    return `<div class="faceit_compare_overlay">
+        <div class="faceit_compare_modal">
+            <div class="faceit_cmp_header">
+                <span>COMPARE STATS</span>
+                <span class="faceit_cmp_close">✕</span>
+            </div>
+            <div class="faceit_cmp_players">
+                ${playerHdr(profData, profElo, profLevel, 'a')}
+                <div class="faceit_cmp_vs">VS</div>
+                ${playerHdr(myData, myElo, myLevel, 'b')}
+            </div>
+            <div class="faceit_cmp_elo_diff">
+                <span class="faceit_cmp_elo_diff_val">${profElo} ELO</span>
+                <span class="faceit_cmp_elo_diff_main ${eloDiffClass}">${eloDiffStr}</span>
+                <span class="faceit_cmp_elo_diff_val faceit_cmp_elo_diff_val_r">${myElo} ELO</span>
+            </div>
+            <div class="faceit_cmp_rows">
+                ${cmpRow('WIN RATE', pWR, mWR)}
+                ${cmpRow('K/D RATIO', pKD, mKD)}
+                ${cmpRow('HS %', pHS, mHS)}
+                ${cmpRow('ADR', pADR, mADR)}
+                ${cmpRow('MATCHES', pM, mM)}
+                ${cmpRow('WIN STREAK', pWS, mWS)}
+            </div>
+            ${mapSection}
+        </div>
+    </div>`;
+};
 // Safe wrapper — silently ignores "Extension context invalidated" after reloads
 const sendMessage = (msg, cb) => { try { chrome.runtime.sendMessage(msg, cb); } catch (e) {} };
 
@@ -249,6 +361,15 @@ const fetchUrl = (url) => new Promise(resolve => {
         );
     } catch (e) { resolve(null); }
 });
+
+// Get the logged-in Steam user's SteamID64 by parsing existing script tags (no injection needed)
+const getLoggedInSteamID = () => {
+    for (const script of document.querySelectorAll('script:not([src])')) {
+        const m = script.textContent.match(/g_steamID\s*=\s*"(\d+)"/);
+        if (m && m[1] !== '0') return m[1];
+    }
+    return null;
+};
 
 // Aggregate party mate stats across all 30 matches and render squad summary
 const loadPartyStats = async () => {
@@ -774,6 +895,14 @@ if (!$(".faceit_maps")[0]) {
                                             if (!BAN_STATUSES.includes(banned)) {
                                                 $('.faceit_content').css('padding-top', '28px').prepend(`<div class="faceit_banned" data-tooltip-html="Ban reason">Banned for: ${banned}</div>`)
                                             }
+
+                                            // Store data and show compare button if user is logged in and viewing someone else
+                                            viewedPlayerStore = { data: profileData, lifetime, segments, elo: profileElo, level: profileLevel };
+                                            const myID = getLoggedInSteamID();
+                                            if (myID && myID !== steamID) {
+                                                comparedSteamID = myID;
+                                                $('.faceit_level_banner_content').append('<button class="faceit_compare_btn">⚖ Compare</button>');
+                                            }
                                         },
                                         complete: () => {
                                             $('.faceit_content').css('display', 'flex');
@@ -927,4 +1056,51 @@ $(document).on('change', '.faceit_maps_option input', function () {
     // Re-render maps
     $('.faceit_maps').empty();
     if (window._faceit_segments) getMapsStats(window._faceit_segments);
+});
+// Compare button — fetch logged-in user's stats and show comparison modal
+$(document).on('click', '.faceit_compare_btn', async function () {
+    if ($('.faceit_compare_overlay').length) return;
+    const $btn = $(this);
+    const showModal = (myProfile, myElo, myLevel, myStats) => {
+        $('body').append(compareModalLayout(
+            viewedPlayerStore.data, viewedPlayerStore.elo, viewedPlayerStore.level, viewedPlayerStore.lifetime,
+            myProfile, myElo, myLevel, myStats.lifetime,
+            viewedPlayerStore.segments, myStats.segments
+        ));
+    };
+    if (myCompareCache) {
+        const { myProfile, myElo, myLevel, myStats } = myCompareCache;
+        showModal(myProfile, myElo, myLevel, myStats);
+        return;
+    }
+    $btn.text('Loading...');
+    try {
+        const myProfile = await new Promise((res, rej) => $.getJSON({
+            url: `${API_URL}/players?game=cs2&game_player_id=${comparedSteamID}`,
+            success: res, error: rej
+        }));
+        const [myStats, myPlayer] = await Promise.all([
+            new Promise((res, rej) => $.getJSON({ url: `${API_URL}/players/${myProfile.player_id}/stats/cs2`, success: res, error: rej })),
+            new Promise((res, rej) => $.getJSON({ url: `${API_URL}/players/${myProfile.player_id}`, success: res, error: rej }))
+        ]);
+        const myElo = myPlayer.games?.cs2?.faceit_elo ?? '?';
+        const myLevel = myPlayer.games?.cs2?.skill_level ?? 1;
+        myCompareCache = { myProfile, myElo, myLevel, myStats };
+        showModal(myProfile, myElo, myLevel, myStats);
+    } catch (e) {
+        $btn.text('No Faceit account');
+        setTimeout(() => $btn.text('⚖ Compare'), 2000);
+        return;
+    }
+    $btn.text('⚖ Compare');
+});
+// Close compare modal on overlay click or close button
+$(document).on('click', '.faceit_compare_overlay', e => {
+    if ($(e.target).hasClass('faceit_compare_overlay') || $(e.target).hasClass('faceit_cmp_close')) {
+        $('.faceit_compare_overlay').remove();
+    }
+});
+// Close compare modal on ESC key
+$(document).on('keydown', e => {
+    if (e.key === 'Escape') $('.faceit_compare_overlay').remove();
 });
