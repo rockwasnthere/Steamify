@@ -25,11 +25,8 @@ const
     // Preloader bar
     ELEMENT_LOADING =
     $('<div>', {
-        class: "LoadingWrapper wrapper-orange"
-    }).append($('<div>', { class: "LoadingThrobber" })
-        .append($('<div>', { class: "Bar Bar1" }))
-        .append($('<div>', { class: "Bar Bar2" }))
-        .append($('<div>', { class: "Bar Bar3" }))),
+        class: "showcase_content_bg showcase_stats_row steamify-loader-wrap"
+    }).append($('<div>', { class: "steamify-loader" })),
 
     // No profile on faceit
     ELEMENT_NO_CS =
@@ -539,7 +536,6 @@ const getLastGames = () => {
                 });
             },
             complete: () => {
-                $('.faceit_stats_content').attr('style', 'margin-top: 8px !important');
                 $('.faceit_stats_load').text(`LOADING... [${loadingCounter - 1}]`);
 
                 if (loadingCounter === matchesList.length) {
@@ -750,7 +746,7 @@ if (!$(".faceit_maps")[0]) {
         statusCode: {
             // If faceit profile not found return error
             404: function() {
-                $('.LoadingWrapper').hide();
+                $('.steamify-loader-wrap').hide();
                 $('.profile_content').prepend(ELEMENT_FACEIT_NOT_FOUND);
                 $('.showcase_stats_row').css('display', 'flex').css('justify-content', 'center');
                 showSponsor();
@@ -759,6 +755,7 @@ if (!$(".faceit_maps")[0]) {
         },
         success: data => {
             faceitPlayerID = data.player_id;
+            const playerProfile = data;
 
             let win = lose = 0;
 
@@ -842,31 +839,27 @@ if (!$(".faceit_maps")[0]) {
                         if (matchesList.length < matchesLimit) matchesLimit = matchesList.length;
 
                         // Get lifetime stats
-                        $.getJSON({
-                            url: `${API_URL}/players/${faceitPlayerID}`,
-                            success: data => {
-                                // If cs2 profile exists
-                                if (data.games['cs2']) {
-                                    const profileData = data;
+                        if (playerProfile.games['cs2']) {
+                            const profileData = playerProfile;
 
-                                    const {
-                                        games: {
-                                            cs2: {
-                                                faceit_elo: profileElo,
-                                                skill_level: profileLevel
-                                            }
-                                        }
-                                    } = profileData;
+                            const {
+                                games: {
+                                    cs2: {
+                                        faceit_elo: profileElo,
+                                        skill_level: profileLevel
+                                    }
+                                }
+                            } = profileData;
 
-                                    // Get cs2 stats
-                                    $.getJSON({
+                            // Get cs2 stats
+                            $.getJSON({
                                         url: `${API_URL}/players/${faceitPlayerID}/stats/cs2`,
                                         success: data => {
                                             let { lifetime, segments } = data;
 
                                             segments.sort((a, b) => parseInt(b.stats.Matches) - parseInt(a.stats.Matches));
 
-                                            $('.LoadingWrapper').hide();
+                                            $('.steamify-loader-wrap').hide();
                                             $('.faceit_content').prepend(
                                                 showcaseLayout(
                                                     lifetime,
@@ -915,21 +908,19 @@ if (!$(".faceit_maps")[0]) {
                                         },
                                         error: data => {
                                             if (data.status === 404) {
-                                                $('.LoadingWrapper').hide();
+                                                $('.steamify-loader-wrap').hide();
                                                 $('.profile_content').prepend(ELEMENT_NO_CS);
                                                 return;
                                             }
                                         }
-                                    });
-                                } else {
-                                    $('.LoadingWrapper').hide();
-                                    $('.profile_content').prepend(ELEMENT_NO_CS);
-                                    return;
-                                }
-                            }
-                        });
+                            });
+                        } else {
+                            $('.steamify-loader-wrap').hide();
+                            $('.profile_content').prepend(ELEMENT_NO_CS);
+                            return;
+                        }
                     } else {
-                        $('.LoadingWrapper').hide();
+                        $('.steamify-loader-wrap').hide();
                         $('.profile_content').prepend(ELEMENT_MATCHES_NOT_FOUND);
                         $('.showcase_stats_row').css('display', 'flex').css('justify-content', 'center');
                     }
@@ -938,6 +929,8 @@ if (!$(".faceit_maps")[0]) {
         },
         // Show preloader on request
         beforeSend: () => {
+            const sponsorHidden = localStorage.getItem('steamify_sponsor_hidden') === '1';
+            ELEMENT_LOADING.css('height', sponsorHidden ? '61px' : '236px');
             $('.profile_content').prepend(ELEMENT_LOADING);
         }
     });
@@ -969,8 +962,7 @@ $(document).on('click', '.faceit_stats_load', () => {
     if (!$(".faceit_match_card")[0]) {
         getLastGames();
     } else {
-        $('.faceit_matches_list').toggle();
-        $('.faceit_stats_content').attr('style', `margin-top: ${$('.faceit_matches_list').is(':visible') ? '8px' : '0'} !important`);
+        $('.faceit_matches_list, .faceit_squad_section').toggle();
     }
 });
 // Open match details
@@ -1091,12 +1083,9 @@ $(document).on('click', '.faceit_compare_btn:not(.faceit_details_btn)', async fu
             url: `${API_URL}/players?game=cs2&game_player_id=${comparedSteamID}`,
             success: res, error: rej
         }));
-        const [myStats, myPlayer] = await Promise.all([
-            new Promise((res, rej) => $.getJSON({ url: `${API_URL}/players/${myProfile.player_id}/stats/cs2`, success: res, error: rej })),
-            new Promise((res, rej) => $.getJSON({ url: `${API_URL}/players/${myProfile.player_id}`, success: res, error: rej }))
-        ]);
-        const myElo = myPlayer.games?.cs2?.faceit_elo ?? '?';
-        const myLevel = myPlayer.games?.cs2?.skill_level ?? 1;
+        const myStats = await new Promise((res, rej) => $.getJSON({ url: `${API_URL}/players/${myProfile.player_id}/stats/cs2`, success: res, error: rej }));
+        const myElo = myProfile.games?.cs2?.faceit_elo ?? '?';
+        const myLevel = myProfile.games?.cs2?.skill_level ?? 1;
         myCompareCache = { myProfile, myElo, myLevel, myStats };
         showModal(myProfile, myElo, myLevel, myStats);
     } catch (e) {

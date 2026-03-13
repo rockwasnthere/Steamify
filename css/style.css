@@ -340,8 +340,28 @@
     line-height: 15px;
 }
 
-.wrapper-orange .Bar {
-    background-color: #f44336 !important;
+.steamify-loader-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 952px;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.75) !important;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.steamify-loader {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #67c1f5;
+    border-radius: 50%;
+    animation: steamify-spin 0.7s linear infinite;
+}
+
+@keyframes steamify-spin {
+    to { transform: rotate(360deg); }
 }
 
 .faceit_content .value {
