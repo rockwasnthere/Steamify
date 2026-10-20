@@ -54,7 +54,9 @@
     gap: 6px;
 }
 
-.faceit_maps_cog {
+/* Shared by the maps filter and the banner-background gear menu */
+.faceit_maps_cog,
+.faceit_bg_cog {
     cursor: pointer;
     font-size: 11px;
     color: #808080;
@@ -65,13 +67,15 @@
     transition: all 0.2s;
 }
 
-.faceit_maps_cog:hover {
+.faceit_maps_cog:hover,
+.faceit_bg_cog:hover {
     color: #fff;
     background: rgba(255, 255, 255, 0.12);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-.faceit_maps_dropdown {
+.faceit_maps_dropdown,
+.faceit_bg_menu {
     position: fixed;
     background: #1b2838;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -79,11 +83,15 @@
     padding: 6px 0;
     z-index: 9999;
     min-width: 140px;
+}
+
+.faceit_maps_dropdown {
     max-height: 300px;
     overflow-y: auto;
 }
 
-.faceit_maps_option {
+.faceit_maps_option,
+.faceit_bg_opt {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -94,12 +102,14 @@
     font-weight: normal;
 }
 
-.faceit_maps_option:hover {
+.faceit_maps_option:hover,
+.faceit_bg_opt:hover {
     background: rgba(255, 255, 255, 0.05);
     color: #fff;
 }
 
-.faceit_maps_option input {
+.faceit_maps_option input,
+.faceit_bg_opt input {
     cursor: pointer;
 }
 
@@ -193,6 +203,24 @@
     align-items: center;
     padding: 6px 12px;
     gap: 8px;
+}
+
+/* Banner background override (gear menu) */
+.faceit_level_banner.faceit_bg_none {
+    background-color: #1b2838;
+}
+
+.faceit_bg_settings {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* The gear, menu and options reuse the maps-filter styles (grouped selectors above).
+   Only the bg-specific bit lives here: the radio is display-only (selection is handled
+   by the .faceit_bg_opt[data-bg] click handler), so it must not capture clicks. */
+.faceit_bg_opt input {
+    pointer-events: none;
 }
 
 .faceit_level_icon {
@@ -490,6 +518,46 @@
     width: 100% !important;
 }
 
+.stat_increase {
+    color: #73c716;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.stat_decrease {
+    color: #d7571b;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.faceit_player_badge {
+    font-size: 9px;
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.faceit_player_afk_badge {
+    background-color: rgba(255, 85, 0, 0.8);
+    color: #fff;
+}
+
+.faceit_player_leaver_badge {
+    background-color: rgba(244, 67, 54, 0.8);
+    color: #fff;
+}
+
+.faceit_player_kicked_badge {
+    background-color: rgba(156, 39, 176, 0.8);
+    color: #fff;
+}
+
+.faceit_player_afk,
+.faceit_player_leaver,
+.faceit_player_kicked {
+    opacity: 0.6;
+}
+
 .text-white {
     color: #fff !important;
 }
@@ -739,6 +807,7 @@
 }
 
 .faceit_match_card {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -884,6 +953,42 @@
     flex-shrink: 0;
 }
 
+.faceit_match_rating {
+    width: 42px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+/* FACEIT-style rating pill: tinted bg + colored underline, both derived from the tier color */
+.faceit_match_rating span {
+    display: inline-block;
+    position: relative;
+    width: 38px;
+    padding: 2px 0 5px;
+    border-radius: 4px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.faceit_match_rating span::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: currentColor;
+}
+
+/* FACEIT rating tier colors (sampled from faceit.com match history) */
+.faceit_rating_red     { color: #ff2727; }
+.faceit_rating_neutral { color: #ffffff; }
+.faceit_rating_green   { color: #6ade43; }
+.faceit_rating_gold    { color: #ff7300; }
+
 .faceit_match_stat_label {
     color: #808080;
 }
@@ -902,6 +1007,30 @@
 
 .faceit_match_abandoned {
     flex: 1;
+}
+
+/* Keep the LEFT / AFK / KICKED badge on the left of the row, just vertically centered */
+.faceit_stats_leaver .faceit_match_result {
+    display: flex;
+    align-items: center;
+}
+
+.faceit_stats_nostats {
+    cursor: default;
+}
+
+.faceit_stats_nostats {
+    cursor: default;
+}
+
+.faceit_match_cup {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    cursor: default;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
 }
 
 .faceit_match_link {
